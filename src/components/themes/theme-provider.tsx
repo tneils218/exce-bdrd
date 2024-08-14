@@ -25,7 +25,7 @@ export function ThemeProvider({ children, defaultTheme = "system", storageKey = 
 
   useEffect(() => {
     const root = window.document.documentElement;
-
+console.log(root);
     root.classList.remove("light", "dark");
 
     if (theme === "system") {

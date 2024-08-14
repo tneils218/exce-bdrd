@@ -1,3 +1,4 @@
+import { text } from 'stream/consumers';
 import tailwindAnimate from 'tailwindcss-animate';
 
 /** @type {import('tailwindcss').Config} */
@@ -69,5 +70,16 @@ export default {
       },
     },
   },
-  plugins: [tailwindAnimate],
+  plugins: [
+    tailwindAnimate,
+    function ({ addUtilities }) {
+      const newUtilities = {
+        '.text-shadow-lg': {
+          textShadow: '4px 4px 8px rgba(0, 0, 0, 0.2)',
+        }
+      };
+
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+  ],
 };
