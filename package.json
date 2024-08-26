@@ -30,7 +30,8 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-router-dom": "^6.26.0",
-    "tailwindcss-animate": "^1.0.6"
+    "tailwindcss-animate": "^1.0.6",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20.8.0",

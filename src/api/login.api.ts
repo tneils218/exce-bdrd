@@ -3,9 +3,13 @@ import axiosClient from "@/api/base.api.ts";
 const baseUrl = "/api/v1/auth";
 
 const authApi = {
-  login() {
+  login(username: string, password: string) {
     const url = `${baseUrl}/login`;
-    return axiosClient.post(url);
+    const body = {
+      email: username,
+      password: password,
+    };
+    return axiosClient.post(url, body);
   },
 };
 

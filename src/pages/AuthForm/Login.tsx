@@ -9,18 +9,38 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
+import userStore from "@/stores/user.store.ts";
+import authApi from "@/api/login.api.ts";
 
 const Login: React.FC = () => {
+  const { set } = userStore((state: any) => state);
+
   const [postData, setPostData] = React.useState({
     username: "",
     password: "",
   });
-  const clear = () => {
+  const clearData = () => {
     setPostData({ username: "", password: "" });
   };
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    clear();
+
+    try {
+      // Gọi API login
+      const response = await authApi.login(
+        postData.username,
+        postData.password,
+      );
+      set(response);
+      // Xử lý phản hồi từ API nếu cần
+      console.log(response);
+
+      // Xóa dữ liệu sau khi API trả về thành công
+      clearData();
+    } catch (error) {
+      // Xử lý lỗi nếu có
+      console.error("Login failed:", error);
+    }
   };
   return (
     <div className="flex min-h-screen items-center justify-center">

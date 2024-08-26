@@ -11,6 +11,12 @@ import { Label } from "@/components/ui/label";
 import React from "react";
 
 const Register: React.FC = () => {
+  const [postData, setPostData] = React.useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
   return (
     <div className="flex min-h-screen items-center justify-center">
       <Card className="mx-auto max-w-sm">
@@ -25,11 +31,25 @@ const Register: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="first-name">First name</Label>
-                <Input id="first-name" placeholder="Max" required />
+                <Input
+                  id="first-name"
+                  placeholder="Max"
+                  required
+                  onChange={(e) =>
+                    setPostData({ ...postData, firstName: e.target.value })
+                  }
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="last-name">Last name</Label>
-                <Input id="last-name" placeholder="Robinson" required />
+                <Input
+                  id="last-name"
+                  placeholder="Robinson"
+                  required
+                  onChange={(e) =>
+                    setPostData({ ...postData, lastName: e.target.value })
+                  }
+                />
               </div>
             </div>
             <div className="grid gap-2">
@@ -39,11 +59,20 @@ const Register: React.FC = () => {
                 type="email"
                 placeholder="m@example.com"
                 required
+                onChange={(e) =>
+                  setPostData({ ...postData, email: e.target.value })
+                }
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" />
+              <Input
+                id="password"
+                type="password"
+                onChange={(e) =>
+                  setPostData({ ...postData, password: e.target.value })
+                }
+              />
             </div>
             <Button type="submit" className="w-full dark:text-black">
               Create an account
