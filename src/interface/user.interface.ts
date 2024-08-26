@@ -1,5 +1,7 @@
-export interface UserInterface {
+export interface UserStoreInterface {
   token: string;
   expires: number;
-  data: object;
+  data: Record<string, any>;
+  set: (state: Partial<UserStoreInterface>) => void;
+  clear: () => void;
 }

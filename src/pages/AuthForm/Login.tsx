@@ -11,10 +11,15 @@ import { Label } from "@/components/ui/label";
 import React from "react";
 import userStore from "@/stores/user.store.ts";
 import authApi from "@/api/login.api.ts";
+import { StatusCode } from "@/commons/utils.ts";
+import { UserStoreInterface } from "@/interface/user.interface.ts";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
-  const { set } = userStore((state: any) => state);
-
+  const { set } = userStore((state: UserStoreInterface) => ({
+    set: state.set,
+  }));
+  const navigate = useNavigate();
   const [postData, setPostData] = React.useState({
     username: "",
     password: "",
@@ -26,19 +31,17 @@ const Login: React.FC = () => {
     e.preventDefault();
 
     try {
-      // Gọi API login
       const response = await authApi.login(
         postData.username,
         postData.password,
       );
-      set(response);
-      // Xử lý phản hồi từ API nếu cần
+      if (response.status === StatusCode.OK) {
+        set(response);
+        navigate("/");
+      }
       console.log(response);
-
-      // Xóa dữ liệu sau khi API trả về thành công
       clearData();
     } catch (error) {
-      // Xử lý lỗi nếu có
       console.error("Login failed:", error);
     }
   };
