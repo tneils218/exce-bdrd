@@ -14,13 +14,16 @@ export type selectedLanguageOptionProps = {
   aliases: string[];
   runtime?: string;
 };
-export default function SelectLanguages({
+
+export type SelectLanguagesProps = {
+  onSelect: (value: selectedLanguageOptionProps) => void;
+  selectedLanguageOption: selectedLanguageOptionProps;
+};
+
+export const SelectLanguages: React.FC<SelectLanguagesProps> = ({
   onSelect,
   selectedLanguageOption,
-}: {
-  onSelect: any;
-  selectedLanguageOption: selectedLanguageOptionProps;
-}) {
+}) => {
   return (
     <Listbox value={selectedLanguageOption} onChange={onSelect}>
       {({ open }) => (
@@ -94,4 +97,4 @@ export default function SelectLanguages({
       )}
     </Listbox>
   );
-}
+};

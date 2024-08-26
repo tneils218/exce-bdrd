@@ -1,15 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import React from "react";
 
-export default function Register() {
+const Register: React.FC = () => {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-xl">Sign Up</CardTitle>
-          <CardDescription>Enter your information to create an account</CardDescription>
+          <CardDescription>
+            Enter your information to create an account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
@@ -25,7 +34,12 @@ export default function Register() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+              />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
@@ -34,13 +48,10 @@ export default function Register() {
             <Button type="submit" className="w-full dark:text-black">
               Create an account
             </Button>
-            <Button variant="outline" className="w-full">
-              Sign up with GitHub
-            </Button>
           </div>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
-            <a href="#" className="underline">
+            <a href="/login" className="underline">
               Sign in
             </a>
           </div>
@@ -48,4 +59,6 @@ export default function Register() {
       </Card>
     </div>
   );
-}
+};
+
+export default Register;

@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
-import SelectLanguages, {
+import React, { useRef, useState } from "react";
+import {
   selectedLanguageOptionProps,
+  SelectLanguages,
 } from "./SelectLanguages.tsx";
 import Editor from "@monaco-editor/react";
 import { AlertTriangle, Loader, Play } from "lucide-react";
@@ -14,7 +15,7 @@ export interface CodeSnippetsProps {
   [key: string]: string;
 }
 
-export default function EditorComponent() {
+const EditorComponent: React.FC = () => {
   const [sourceCode, setSourceCode] = useState(codeSnippets["javascript"]);
   const [languageOption, setLanguageOption] = useState(languageOptions[0]);
   const [loading, setLoading] = useState(false);
@@ -154,4 +155,5 @@ export default function EditorComponent() {
       </div>
     </div>
   );
-}
+};
+export default EditorComponent;

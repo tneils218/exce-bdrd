@@ -21,8 +21,9 @@ import {
   ShoppingCart,
   Users2,
 } from "lucide-react";
+import React from "react";
 
-const NavBar = () => {
+const NavBar: React.FC = () => {
   return (
     <div>
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
