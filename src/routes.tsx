@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import { routes } from "@/interface/approute.interface.tsx";
 import ProtectedRoute from "@/pages/ProtectedRoute.tsx";
+import { routes } from "@/AppRoute.tsx";
 
 const RouteWithNavBar: React.FC<{
   element: React.ReactNode;
