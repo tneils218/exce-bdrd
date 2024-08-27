@@ -9,16 +9,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
-import userStore from "@/stores/user.store.ts";
 import authApi from "@/api/login.api.ts";
-import { StatusCode } from "@/commons/utils.ts";
-import { UserStoreInterface } from "@/interface/user.interface.ts";
 import { useNavigate } from "react-router-dom";
+import { StatusCode } from "@/commons/utils.ts";
 
 const Login: React.FC = () => {
-  const { set } = userStore((state: UserStoreInterface) => ({
-    set: state.set,
-  }));
   const navigate = useNavigate();
   const [postData, setPostData] = React.useState({
     username: "",
@@ -36,10 +31,11 @@ const Login: React.FC = () => {
         postData.password,
       );
       if (response.status === StatusCode.OK) {
-        set(response);
+        localStorage.setItem("token", `${response.data.data.token}`);
+        localStorage.setItem("user", `${JSON.stringify(response.data.data)}`);
+        localStorage.setItem("expires", `${response.data.data.expires}`);
         navigate("/");
       }
-      console.log(response);
       clearData();
     } catch (error) {
       console.error("Login failed:", error);

@@ -48,25 +48,9 @@ import {
   ShoppingCart,
   Users2,
 } from "lucide-react";
-import React, { useEffect } from "react";
-import userApi from "@/api/user.api.ts";
+import React from "react";
 
 const HomePage: React.FC = () => {
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await userApi.getAll();
-        console.log(response);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        console.log("Fetch users");
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">

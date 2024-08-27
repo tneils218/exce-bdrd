@@ -1,19 +1,31 @@
+import React, { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import React, { lazy, Suspense } from "react";
+import { routes } from "@/interface/approute.interface.tsx";
+import ProtectedRoute from "@/pages/ProtectedRoute.tsx";
 
-const Test = lazy(() => import("./pages/Test.tsx"));
-const HomePage = lazy(() => import("./pages/HomePage"));
-const Login = lazy(() => import("./pages/AuthForm/Login"));
-const Register = lazy(() => import("./pages/AuthForm/Register"));
+const RouteWithNavBar: React.FC<{
+  element: React.ReactNode;
+  showNavBar?: boolean;
+  isProtected?: boolean;
+}> = ({ element, isProtected }) => {
+  return (
+    <>{isProtected ? <ProtectedRoute>{element}</ProtectedRoute> : element}</>
+  );
+};
 
 export const Routers: React.FC = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/test" element={<Test />} />
+        {routes.map(({ path, element, isProtected }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <RouteWithNavBar element={element} isProtected={isProtected} />
+            }
+          />
+        ))}
       </Routes>
     </Suspense>
   );

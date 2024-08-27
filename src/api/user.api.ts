@@ -3,8 +3,7 @@ import axiosClient from "@/api/base.api.ts";
 const baseUrl = "/api/v1/user";
 const userApi = {
   getAll() {
-    const url = baseUrl;
-    return axiosClient.get(url);
+    return axiosClient.get(baseUrl);
   },
 
   getById(id: string) {
@@ -13,8 +12,7 @@ const userApi = {
   },
 
   create(data: object) {
-    const url = baseUrl;
-    return axiosClient.post(url, data);
+    return axiosClient.post(baseUrl, data);
   },
 
   update(id: string, data: object) {

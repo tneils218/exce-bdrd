@@ -2,16 +2,23 @@ import { ThemeProvider } from "./components/themes/theme-provider";
 import { Routers } from "./routes";
 import NavBar from "@/pages/NavBar.tsx";
 import React from "react";
-import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  matchPath,
+  useLocation,
+} from "react-router-dom";
+import { routes } from "@/interface/approute.interface.tsx";
 
 const AppContent: React.FC = () => {
   const location = useLocation();
-  const hideNavBarRoutes = ["/login", "/register"];
-  const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname);
+  const currentRoute = routes.find((route) => {
+    return matchPath(route.path, location.pathname);
+  });
+  const shouldShowNavBar = currentRoute?.showNavBar;
 
   return (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      {!shouldHideNavBar && <NavBar />}
+      {shouldShowNavBar && <NavBar />}
       <Routers />
     </ThemeProvider>
   );

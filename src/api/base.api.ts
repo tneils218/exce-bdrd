@@ -24,7 +24,7 @@ axiosClient.interceptors.request.use(
 // Interceptor cho response
 axiosClient.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response;
   },
   (error) => {
     if (error.response && error.response.status === 401) {
