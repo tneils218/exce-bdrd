@@ -1,13 +1,9 @@
+// AppRoute.tsx
 import React from "react";
-import HomePage from "@/pages/HomePage.tsx";
-import Login from "@/pages/AuthForm/Login.tsx";
-import Register from "@/pages/AuthForm/Register.tsx";
-import Test from "@/pages/Test.tsx";
-import NotFoundPage from "@/pages/404NotFound.tsx";
 
 interface AppRoute {
   path: string;
-  element: React.ReactNode;
+  element: () => Promise<{ default: React.ComponentType }>; // Function returning a promise resolving to a component
   showNavBar?: boolean;
   isProtected?: boolean;
 }
@@ -15,31 +11,31 @@ interface AppRoute {
 export const routes: AppRoute[] = [
   {
     path: "/",
-    element: <HomePage />,
+    element: () => import("@/pages/HomePage.tsx"),
     showNavBar: true,
     isProtected: true,
   },
   {
     path: "/login",
-    element: <Login />,
+    element: () => import("@/pages/AuthForm/Login.tsx"),
     showNavBar: false,
     isProtected: false,
   },
   {
     path: "/register",
-    element: <Register />,
+    element: () => import("@/pages/AuthForm/Register.tsx"),
     showNavBar: false,
     isProtected: false,
   },
   {
     path: "/test",
-    element: <Test />,
+    element: () => import("@/pages/Test.tsx"),
     showNavBar: true,
     isProtected: false,
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    element: () => import("@/pages/404NotFound.tsx"),
     showNavBar: false,
     isProtected: false,
   },

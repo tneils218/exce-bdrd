@@ -9,8 +9,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const user = localStorage.getItem("user");
 
   if (!user) {
+    // If there's no user, redirect to the login page
     return <Navigate to="/login" replace />;
   }
+
   return <>{children}</>;
 };
+
 export default ProtectedRoute;
