@@ -11,6 +11,14 @@ const authApi = {
     };
     return axiosClient.post(url, body);
   },
+  register(body: object) {
+    const url = `${baseUrl}/register`;
+    return axiosClient.post(url, body);
+  },
+  logout() {
+    const url = `${baseUrl}/logout`;
+    return axiosClient.post(url);
+  },
 };
 
 export default authApi;

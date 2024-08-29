@@ -3,7 +3,7 @@ import React from "react";
 
 interface AppRoute {
   path: string;
-  element: () => Promise<{ default: React.ComponentType }>; // Function returning a promise resolving to a component
+  element: () => Promise<{ default: React.ComponentType }>;
   showNavBar?: boolean;
   isProtected?: boolean;
 }

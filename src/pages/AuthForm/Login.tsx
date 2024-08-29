@@ -19,6 +19,7 @@ const Login: React.FC = () => {
     username: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const clearData = () => {
     setPostData({ username: "", password: "" });
   };
@@ -37,8 +38,8 @@ const Login: React.FC = () => {
         navigate("/");
       }
       clearData();
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (error: any) {
+      setErrorMessage(error?.response.data.message);
     }
   };
   return (
@@ -53,6 +54,11 @@ const Login: React.FC = () => {
         <CardContent>
           <form autoComplete="off" onSubmit={handleSubmit}>
             <div className="grid gap-4">
+              {errorMessage && (
+                <div className="text-red-500 text-sm text-center">
+                  {errorMessage}
+                </div>
+              )}
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
