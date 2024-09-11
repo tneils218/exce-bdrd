@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 
 export type SelectLanguagesProps = {
   onSelect: (value: selectedLanguageOptionProps) => void;
