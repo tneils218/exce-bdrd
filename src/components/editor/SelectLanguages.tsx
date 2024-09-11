@@ -1,5 +1,12 @@
 import React from "react";
 import { languageOptions } from "@/components/editor/config.ts";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export type SelectLanguagesProps = {
   onSelect: (value: selectedLanguageOptionProps) => void;
@@ -12,12 +19,12 @@ export type selectedLanguageOptionProps = {
   aliases: string[];
   runtime?: string;
 };
+
 export const SelectLanguages: React.FC<SelectLanguagesProps> = ({
   onSelect,
   selectedLanguageOption,
 }) => {
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
+  const handleChange = (selectedValue: string) => {
     const selectedOption = languageOptions.find(
       (option) => option.language === selectedValue,
     );
@@ -28,17 +35,23 @@ export const SelectLanguages: React.FC<SelectLanguagesProps> = ({
 
   return (
     <div className="relative">
-      <select
-        value={selectedLanguageOption.language}
-        onChange={handleChange}
-        className="relative w-full cursor-pointer rounded-md bg-white py-2 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm sm:leading-6"
+      <Select
+        onValueChange={handleChange}
+        defaultValue={selectedLanguageOption.language}
       >
-        {languageOptions.map((item) => (
-          <option key={item.language} value={item.language}>
-            {item.name} ({item.version})
-          </option>
-        ))}
-      </select>
+        <SelectTrigger className="w-full">
+          <SelectValue
+            placeholder={`${selectedLanguageOption.name} (${selectedLanguageOption.version})`}
+          />
+        </SelectTrigger>
+        <SelectContent>
+          {languageOptions.map((item) => (
+            <SelectItem key={item.language} value={item.language}>
+              {item.name} ({item.version})
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

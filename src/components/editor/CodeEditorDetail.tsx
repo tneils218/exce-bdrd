@@ -35,7 +35,6 @@ const EditorComponent: React.FC = () => {
   }
 
   function onSelect(value: selectedLanguageOptionProps) {
-    console.log("Selected value:", value);
     setLanguageOption(value);
     setSourceCode(codeSnippets[value.language]);
   }
