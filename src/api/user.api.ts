@@ -3,7 +3,7 @@ import axiosClient from "@/api/base.api.ts";
 const baseUrl = "/api/v1/user";
 const userApi = {
   getAll() {
-    return axiosClient.get(baseUrl);
+    return axiosClient.get("/users");
   },
 
   getById(id: string) {
@@ -24,6 +24,7 @@ const userApi = {
     const url = `${baseUrl}/${id}`;
     return axiosClient.delete(url);
   },
+  
 };
 
 export default userApi;

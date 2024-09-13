@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button.tsx";
 import { Home, LineChart, Package, ShoppingCart, Users2 } from "lucide-react";
 import React from "react";
+import { ModeToggle } from "@/components/themes/mode-toggle";
 
 const NavBar: React.FC = () => {
   return (
@@ -95,11 +96,11 @@ const NavBar: React.FC = () => {
                   href="#"
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
-                  <LineChart className="h-5 w-5" />
+                 <ModeToggle />
                   <span className="sr-only">Analytics</span>
                 </a>
               </TooltipTrigger>
-              <TooltipContent side="right">Analytics</TooltipContent>
+              <TooltipContent side="right">Themes</TooltipContent>
             </Tooltip>
           </nav>
         </TooltipProvider>

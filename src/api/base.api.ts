@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_BASE_API_DEV_URL,
+  baseURL:  "https://jsonplaceholder.typicode.com/",
   headers: {
     "Content-Type": "application/json",
   },

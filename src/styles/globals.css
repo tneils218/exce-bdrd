@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -35,7 +34,10 @@
  
     --radius: 0.5rem;
   }
- 
+  .command-list-container {
+    max-height: 200px; /* Chiều cao tối đa của danh sách */
+    overflow-y: auto; /* Thêm thanh cuộn khi nội dung vượt quá chiều cao tối đa */
+  }
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
