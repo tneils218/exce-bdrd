@@ -1,9 +1,9 @@
 import { Exercises } from "@/pages/HomePage";
 import axiosClient from "./base.api"
-
+const baseUrl = "/api/v1/Exam";
 const exercisesAPI = {
     getAll() {
-        return axiosClient.get<Exercises[]>("/posts");
+        return axiosClient.get<Exercises[]>(baseUrl);
     },
     getAllByUserId() {
         return axiosClient.get<Exercises[]>("/posts2");
@@ -11,18 +11,23 @@ const exercisesAPI = {
     getAllByTemplate(template: string){
         return axiosClient.get<Exercises[]>(`/comments?postId=${template}`)
     },
-    delete() {
-        return axiosClient.delete("/delete");
+    delete(data: object) {
+        const url = `${baseUrl}/${data.id}`
+        return axiosClient.delete(url);
     },
-    add(title: string, content : string) {
-        return axiosClient.post("/add", {title,content})
+    add(data: object) {
+        return axiosClient.post("/add", data)
     },
    
-    edit(id:string,  title:string, content:string) {
-        return axiosClient.post("/edit", {id, title, content})
+    edit(data: object) {
+        return axiosClient.post("/edit", data)
     },
-    assign(id:string, userId:string) {
-        return axiosClient.post("/assign",{id,userId})
+    assign(data: object) {
+        return axiosClient.post("/assign",data)
+    },
+    submit(data: object){
+        return axiosClient.post("/submit",data)
     }
+
 } 
 export default exercisesAPI;

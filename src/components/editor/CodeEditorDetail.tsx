@@ -10,18 +10,32 @@ import toast from "react-hot-toast";
 import { compileCode } from "@/components/editor/complite.ts";
 import { ModeToggle } from "@/components/themes/mode-toggle.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { useLocation } from "react-router-dom";
+import CustomFormDialog from "../dialogs/CustomDialog.tsx";
+import exercisesAPI from "@/api/excercise.api.ts";
 
 export interface CodeSnippetsProps {
   [key: string]: string;
 }
 
-const EditorComponent: React.FC = () => {
+const EditorComponent: React.FC = ({}) => {
+  const location = useLocation();
+  const { item } = location.state || { item: null };
   const [sourceCode, setSourceCode] = useState(codeSnippets["javascript"]);
   const [languageOption, setLanguageOption] = useState(languageOptions[0]);
   const [loading, setLoading] = useState(false);
   const [output, setOutput] = useState([]);
+  const [isOpen, setIsOpen] = useState({ open: false, func: "", id: "" });
+  const [fields, setFields] = useState([]);
+  const [apiFunc, setApiFunc] = useState();
   const [err, setErr] = useState(false);
   const editorRef = useRef(null);
+
+  const handlePopup = (func: any, fields: any, apiFunc: any, id: any = "") => {
+    setIsOpen({ open: !isOpen.open, func: func, id: id });
+    setFields(fields);
+    setApiFunc(apiFunc);
+  };
 
   function handleEditorDidMount(editor: any) {
     editorRef.current = editor;
@@ -86,7 +100,7 @@ const EditorComponent: React.FC = () => {
         {/* LEFT SIDE: Problem Statement */}
         <div className="w-1/2 pr-4 flex flex-col">
           <div className="bg-slate-200 dark:bg-slate-800 rounded-2xl p-4 flex-grow overflow-auto">
-            <p>Your problem description goes here...</p>
+            <p>{item.body}</p>
           </div>
         </div>
 
@@ -149,10 +163,32 @@ const EditorComponent: React.FC = () => {
                   </>
                 )}
               </div>
+              <Button
+                className="dark:bg-purple-600 dark:hover:bg-purple-700 text-slate-100 bg-slate-800 hover:bg-slate-900"
+                onClick={() => handlePopup(
+                  "Submit",
+                  [
+                    {
+                      name: "file",
+                      label: "File",
+                      type: "file",
+                    },
+                  ],
+                  () => exercisesAPI.submit
+                )}
+              >
+                Submit Answer
+              </Button>
             </div>
           </div>
         </div>
       </div>
+      <CustomFormDialog
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        fields={fields}
+        apiFunction={apiFunc}
+      />
     </div>
   );
 };

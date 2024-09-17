@@ -51,6 +51,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { ModeToggle } from "@/components/themes/mode-toggle";
 import CustomFormDialog from "@/components/dialogs/CustomDialog";
+import { useNavigate } from "react-router-dom";
 // import {
 //   Pagination,
 //   PaginationContent,
@@ -73,15 +74,20 @@ const HomePage: React.FC = () => {
   const [isOpen, setIsOpen] = useState({ open: false, func: "", id: "" });
   const [template, setTemplate] = useState("All");
   const [fields, setFields] = useState([]);
-  const [apiFunc,setApiFunc] = useState();
+  const [apiFunc, setApiFunc] = useState();
   const isMentor = true;
+  const navigate = useNavigate();
   // localStorage.getItem("token") ==
   // JSON.parse(localStorage.getItem("user")).token;
 
-  const handlePopup = (func: any, fields: any,  apiFunc: any, id: any = "") => {
+  const handlePopup = (func: any, fields: any, apiFunc: any, id: any = "") => {
     setIsOpen({ open: !isOpen.open, func: func, id: id });
     setFields(fields);
     setApiFunc(apiFunc);
+  };
+
+  const handleClick = (item: any) => {
+    navigate("/test", { state: { item } });
   };
 
   useEffect(() => {
@@ -220,24 +226,28 @@ const HomePage: React.FC = () => {
                   variant="outline"
                   className="h-7 gap-1 "
                   onClick={() =>
-                    handlePopup("Add", [
-                      {
-                        name: "title",
-                        label: "Title",
-                        type: "text",
-                      },
-                      {
-                        name: "content",
-                        label: "Content",
-                        type: "text-area",
-                      },
-                      // {
-                      //   name: "file",
-                      //   label: "File",
-                      //   type: "file",
-                      // },  
-                    ], () => exercisesAPI.add  
-                  )}
+                    handlePopup(
+                      "Add",
+                      [
+                        {
+                          name: "title",
+                          label: "Title",
+                          type: "text",
+                        },
+                        {
+                          name: "content",
+                          label: "Content",
+                          type: "text-area",
+                        },
+                        // {
+                        //   name: "file",
+                        //   label: "File",
+                        //   type: "file",
+                        // },
+                      ],
+                      () => exercisesAPI.add
+                    )
+                  }
                 >
                   <PlusCircle className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
@@ -315,7 +325,7 @@ const HomePage: React.FC = () => {
                                           type: "search",
                                         },
                                       ],
-                                     () => exercisesAPI.assign,
+                                      () => exercisesAPI.assign,
                                       item.id
                                     )
                                   }
@@ -350,7 +360,25 @@ const HomePage: React.FC = () => {
                                 >
                                   Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>Delete</DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handlePopup(
+                                      "Delete",
+                                      [],
+                                      () => exercisesAPI.delete,
+                                      item.id
+                                    )
+                                  }
+                                >
+                                  Delete
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    handleClick(item);
+                                  }}
+                                >
+                                  Resolve
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </TableCell>
@@ -385,10 +413,6 @@ const HomePage: React.FC = () => {
             </TabsContent>
           </Tabs>
         </main>
-        {/* <DialogDemo
-          isOpen = {isOpen}
-          setIsOpen={setIsOpen}
-        /> */}
         <CustomFormDialog
           isOpen={isOpen}
           setIsOpen={setIsOpen}

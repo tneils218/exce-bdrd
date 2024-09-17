@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-// import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,18 @@ import SearchBar from "./SearchBar";
 const CustomFormDialog = (props: any) => {
   const { isOpen, setIsOpen, fields, apiFunction } = props;
   const [formData, setFormData] = useState({});
+
   const handleChange = (e: any, field: string) => {
+    if (field === "file") {
+      // Check if any file is selected
+      if (e.target.files && e.target.files.length > 0) {
+        const file = e.target.files[0]; // Lấy tệp đầu tiên (hoặc lặp qua nếu cần nhiều tệp)
+        setFormData({ ...formData, [field]: file });
+      } else {
+        // Nếu không có tệp nào được chọn
+        console.log("No file selected");
+      }
+    }
     setFormData({ ...formData, [field]: e.target.value });
   };
 
@@ -28,11 +39,40 @@ const CustomFormDialog = (props: any) => {
 
   const handleSubmit = () => {
     if (apiFunction && typeof apiFunction === "function") {
-      if (Object.keys(formData).length === fields.length) {
-        console.log(formData);
-        apiFunction(formData);
+      let updatedFormData = { ...formData };
+
+      // Add id if function is Edit, Assign, or Delete
+      if (
+        isOpen.func === "Edit" ||
+        isOpen.func === "Assign" ||
+        isOpen.func === "Delete"
+      ) {
+        updatedFormData = { id: isOpen.id, ...updatedFormData };
+        console.log(updatedFormData);
+      }
+
+      if (isOpen.func === "Add") {
+        var user = JSON.parse(localStorage.getItem("user"));
+        console.log(user);
+        updatedFormData = { userId: user.email, ...updatedFormData };
+        console.log(updatedFormData);
+      }
+      // Check if userId exists and is not empty
+      if (
+        isOpen.func === "Assign" &&
+        (!updatedFormData.userId || updatedFormData.userId.length === 0)
+      ) {
+        alert("Please select at least one user.");
+        return;
+      }
+
+      // Ensure all required fields are filled
+      if (Object.keys(updatedFormData).length >= fields.length) {
+        apiFunction(updatedFormData);
         handleCloseDialog();
-      } else alert("You have to fill all the input!");
+      } else {
+        alert("You have to fill all the input!");
+      }
     }
   };
 
@@ -62,22 +102,21 @@ const CustomFormDialog = (props: any) => {
                   className="col-span-3"
                   onChange={(e) => handleChange(e, field.name)}
                 />
-              ) : //   : field.type === "file" ? (
-              //     <Card className="col-span-3">
-              //       <CardContent className="p-6 space-y-4">
-              //         <div className="space-y-2 text-sm">
-              //           <Input
-              //             id="file"
-              //             type="file"
-              //             placeholder="File"
-              //             accept=".rar,.zip"
-              //             onChange={(e) => handleChange(e, field.name)}
-              //           />
-              //         </div>
-              //       </CardContent>
-              //     </Card>
-              //   )
-              field.type === "search" ? (
+              ) : field.type === "file" ? (
+                <Card className="col-span-3">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="space-y-2 text-sm">
+                      <Input
+                        id="file"
+                        type="file"
+                        placeholder="File"
+                        accept=".rar,.zip"
+                        onChange={(e) => handleChange(e, field.name)}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : field.type === "search" ? (
                 <SearchBar setFormData={setFormData} />
               ) : (
                 <Input

@@ -3,7 +3,7 @@ import axiosClient from "@/api/base.api.ts";
 const baseUrl = "/api/v1/user";
 const userApi = {
   getAll() {
-    return axiosClient.get("/users");
+    return axiosClient.get(baseUrl);
   },
 
   getById(id: string) {
