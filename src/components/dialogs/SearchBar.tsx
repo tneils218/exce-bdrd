@@ -11,74 +11,57 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import userApi from "@/api/user.api";
 
-export type Geo = {
-  lat: string;
-  lng: string;
-};
 
-export type Address = {
-  street: string;
-  suite: string;
-  city: string;
-  zipcode: string;
-  geo: Geo;
-};
+// export type User = {
+//   id: number;
+//   fullName: string;
+//   password: string;
+//   email: string;
+//   address: Address;
+//   phone: string;
+//   website: string;
+//   company: Company;
+// };
 
-export type Company = {
-  name: string;
-  catchPhrase: string;
-  bs: string;
-};
-
-export type User = {
-  id: number;
-  name: string;
-  username: string;
-  email: string;
-  address: Address;
-  phone: string;
-  website: string;
-  company: Company;
-};
-
-export type Users = User[];
+// export type students = User[];
 const SearchBar = (props: any) => {
     const { setFormData } = props;
     // const [open, setOpen] = useState(false);
-    const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
-    const [users, setUsers] = useState<Users>([]);
+    const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+    const [students, setStudents] = useState([]);
   
     useEffect(() => {
-      const fetchUsers = async () => {
+      const fetchStudents = async () => {
         try {
           const response = await userApi.getAll();
-          setUsers(response.data);
+          const students = response.data.filter((user: any) => user.role.includes("Students"));
+          setStudents(students);
         } catch (error) {
-          console.error("Failed to fetch users:", error);
+          console.error("Failed to fetch students:", error);
         }
       };
-      fetchUsers();
+      fetchStudents();
     }, []);
   
-    const handleSelect = (userId: number) => {
-      setSelectedUserIds((prevSelectedUserIds) => {
-        const isSelected = prevSelectedUserIds.includes(userId); // Kiểm tra xem userId đã được chọn hay chưa
-        let newSelectedUserIds;
+    const handleSelect = (studentId: number) => {
+        setSelectedStudentIds((prevSelectedStudentIds) => {
+        const isSelected = prevSelectedStudentIds.includes(studentId); // Kiểm tra xem userId đã được chọn hay chưa
+        let newSelectedStudentIds;
   
         if (isSelected) {
           // Nếu đã được chọn, bỏ chọn userId
-          newSelectedUserIds = prevSelectedUserIds.filter((id) => id !== userId);
+          newSelectedStudentIds = prevSelectedStudentIds.filter((id) => id !== studentId);
         } else {
           // Nếu chưa được chọn, thêm userId vào danh sách
-          newSelectedUserIds = [...prevSelectedUserIds, userId];
+          newSelectedStudentIds = [...prevSelectedStudentIds, studentId];
         }
   
         // Cập nhật formData với id và danh sách userId
         setFormData({
-          userId: newSelectedUserIds,
+          userId: newSelectedStudentIds,
         });
   
-        return newSelectedUserIds;
+        return newSelectedStudentIds;
       });
     };
   
@@ -87,20 +70,20 @@ const SearchBar = (props: any) => {
         <CommandInput placeholder="Search data..." />
         <CommandList className="command-list-container">
           <CommandGroup>
-            {users.length > 0 ? (
-              users.map((user: User) => (
+            {students.length > 0 ? (
+              students.map((student) => (
                 <CommandItem
-                  key={user.id}
-                  value={user.name}
-                  onSelect={() => handleSelect(user.id)}
+                  key={student.id}
+                  value={student.fullName}
+                  onSelect={() => handleSelect(student.id)}
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      selectedUserIds.includes(user.id) ? "opacity-100" : "opacity-0"
+                      selectedStudentIds.includes(student.id) ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {user.name}
+                  {student.fullName}
                 </CommandItem>
               ))
             ) : (

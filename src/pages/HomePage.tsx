@@ -1,5 +1,5 @@
 import exercisesAPI from "@/api/excercise.api";
-import { Badge } from "@/components/ui/badge";
+// import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -67,12 +67,14 @@ export type Exercises = {
   title: string;
   content: string;
   userId: number;
+  label: string;
 };
 
 const HomePage: React.FC = () => {
-  const [exercises, setExercise] = useState<Exercises[]>([]);
+  const [exercises, setExercises] = useState<Exercises[]>([]);
+  const [filteredExercises, setFilteredExercises] = useState<Exercises[]>([]);
   const [isOpen, setIsOpen] = useState({ open: false, func: "", id: "" });
-  const [template, setTemplate] = useState("All");
+  const [label, setLabel] = useState("All");
   const [fields, setFields] = useState([]);
   const [apiFunc, setApiFunc] = useState();
   const isMentor = true;
@@ -90,22 +92,32 @@ const HomePage: React.FC = () => {
     navigate("/test", { state: { item } });
   };
 
+  const fetchExercises = async () => {
+    let response;
+    if (isMentor) {
+      response = await exercisesAPI.getAll();
+    } else {
+      response = await exercisesAPI.getAllByUserId();
+    }
+    setExercises(response.data);
+    setFilteredExercises(response.data);
+  };
+
+  const filterExercisesByLabel = () => {
+    if (label === "All") {
+      setFilteredExercises(exercises);
+    } else {
+      setFilteredExercises(exercises.filter((item) => item.label === label));
+    }
+  };
+
   useEffect(() => {
-    const fetchExs = async () => {
-      let response;
-      if (isMentor) {
-        response = await exercisesAPI.getAll();
-      } else response = await exercisesAPI.getAllByUserId();
-      setExercise(response.data);
-      if (template !== "All") {
-        setExercise(
-          exercises.filter((item) => item.userId.toString() === template)
-        );
-      }
-      console.log("render");
-    };
-    fetchExs();
-  }, [template]);
+    fetchExercises();
+  }, []);
+
+  useEffect(() => {
+    filterExercisesByLabel();
+  }, [label, exercises]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -133,13 +145,6 @@ const HomePage: React.FC = () => {
                 >
                   <Home className="h-5 w-5" />
                   Dashboard
-                </a>
-                <a
-                  href="#"
-                  className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  Orders
                 </a>
                 <a
                   href="#"
@@ -189,16 +194,25 @@ const HomePage: React.FC = () => {
           <Tabs defaultValue="All">
             <div className="flex items-center">
               <TabsList>
-                <TabsTrigger value="All" onClick={() => setTemplate("All")}>
+                <TabsTrigger value="All" onClick={() => setLabel("All")}>
                   All
                 </TabsTrigger>
-                <TabsTrigger value="1" onClick={() => setTemplate("1")}>
-                  Console
-                </TabsTrigger>
-                <TabsTrigger value="draft">MVC</TabsTrigger>
+                {Array.from(new Set(exercises.map((i) => i.label))).map(
+                  (uniqueLabel) =>
+                    uniqueLabel && (
+                      <TabsTrigger
+                        value={uniqueLabel}
+                        onClick={() => setLabel(uniqueLabel)}
+                        key={uniqueLabel}
+                      >
+                        {uniqueLabel}
+                      </TabsTrigger>
+                    )
+                )}
+                {/* <TabsTrigger value="draft">MVC</TabsTrigger>
                 <TabsTrigger value="archived" className="hidden sm:flex">
                   Kafka
-                </TabsTrigger>
+                </TabsTrigger> */}
               </TabsList>
               <div className="ml-auto flex items-center gap-2">
                 <DropdownMenu>
@@ -239,6 +253,11 @@ const HomePage: React.FC = () => {
                           label: "Content",
                           type: "text-area",
                         },
+                        {
+                          name: "label",
+                          label: "Label",
+                          type: "text",
+                        },
                         // {
                         //   name: "file",
                         //   label: "File",
@@ -256,7 +275,7 @@ const HomePage: React.FC = () => {
                 </Button>
               </div>
             </div>
-            <TabsContent value={template}>
+            <TabsContent value={label}>
               <Card x-chunk="dashboard-06-chunk-0">
                 <CardHeader>
                   <CardTitle>Exercise</CardTitle>
@@ -268,11 +287,12 @@ const HomePage: React.FC = () => {
                       <TableRow>
                         <TableHead>ID</TableHead>
                         <TableHead>Title</TableHead>
+                        <TableHead>Label</TableHead>
                         <TableHead>Content</TableHead>
-                        <TableHead>CreateAt</TableHead>
-                        <TableHead className="hidden md:table-cell">
+                        {/* <TableHead>CreateAt</TableHead> */}
+                        {/* <TableHead className="hidden md:table-cell">
                           Total Sales
-                        </TableHead>
+                        </TableHead> */}
                         <TableHead className="hidden md:table-cell">
                           Action
                         </TableHead>
@@ -282,20 +302,23 @@ const HomePage: React.FC = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {exercises.map((item) => (
+                      {filteredExercises.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell className="font-medium">
                             {item.id}
                           </TableCell>
-                          <TableCell>
+                          {/* <TableCell>
                             <Badge variant="outline">Draft</Badge>
-                          </TableCell>
-                          <TableCell className="text-left">
+                          </TableCell> */}
+                          {/* <TableCell className="text-left">
                             {" "}
                             {item.id}
-                          </TableCell>
+                          </TableCell> */}
                           <TableCell className="hidden md:table-cell">
                             {item.title}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            {item.label}
                           </TableCell>
                           <TableCell className="hidden md:table-cell ">
                             {item.content}
@@ -347,6 +370,11 @@ const HomePage: React.FC = () => {
                                           label: "Content",
                                           type: "text-area",
                                         },
+                                        {
+                                          name: "label",
+                                          label: "Label",
+                                          type: "text",
+                                        },
                                         // {
                                         //   name: "file",
                                         //   label: "File",
@@ -392,22 +420,7 @@ const HomePage: React.FC = () => {
                     Showing <strong>All</strong> of{" "}
                     <strong>{exercises.length}</strong> exercises
                   </div>
-                  {/* <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious href="#" />
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationLink href="#">1</PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                      <PaginationItem>
-                        <PaginationNext href="#" />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination> */}
+               
                 </CardFooter>
               </Card>
             </TabsContent>

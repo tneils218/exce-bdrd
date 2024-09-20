@@ -11,22 +11,26 @@ const exercisesAPI = {
     getAllByTemplate(template: string){
         return axiosClient.get<Exercises[]>(`/comments?postId=${template}`)
     },
-    delete(data: object) {
-        const url = `${baseUrl}/${data.id}`
+    delete(payload: object) {
+        const url = `${baseUrl}/${payload.id}`
         return axiosClient.delete(url);
     },
-    add(data: object) {
-        return axiosClient.post("/add", data)
-    },
+    add(payload: FormData) {
+        return axiosClient.post(baseUrl, payload, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      },
    
-    edit(data: object) {
-        return axiosClient.post("/edit", data)
+    edit(payload: object) {
+        return axiosClient.put(`${baseUrl}/${payload.id}`, payload)
     },
-    assign(data: object) {
-        return axiosClient.post("/assign",data)
+    assign(payload: object) {
+        return axiosClient.post("/assign",payload)
     },
-    submit(data: object){
-        return axiosClient.post("/submit",data)
+    submit(payload: object){
+        return axiosClient.post("/submit",payload)
     }
 
 } 

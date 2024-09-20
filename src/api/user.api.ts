@@ -11,13 +11,13 @@ const userApi = {
     return axiosClient.get(url);
   },
 
-  create(data: object) {
-    return axiosClient.post(baseUrl, data);
+  create(payload: object) {
+    return axiosClient.post(baseUrl, payload);
   },
 
-  update(id: string, data: object) {
+  update(id: string, payload: object) {
     const url = `${baseUrl}/${id}`;
-    return axiosClient.put(url, data);
+    return axiosClient.put(url, payload);
   },
 
   delete(id: string) {

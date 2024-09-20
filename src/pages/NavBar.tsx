@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button.tsx";
 import { Home, LineChart, Package, ShoppingCart, Users2 } from "lucide-react";
 import React from "react";
 import { ModeToggle } from "@/components/themes/mode-toggle";
+import { Link } from "react-router-dom";
 
 const NavBar: React.FC = () => {
   return (
@@ -45,11 +46,11 @@ const NavBar: React.FC = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href="#"
+                  href="/"
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <Home className="h-5 w-5" />
-                  <span className="sr-only">Dashboard</span>
+                  <span className="sr-only">Homepage</span>
                 </a>
               </TooltipTrigger>
               <TooltipContent side="right">Dashboard</TooltipContent>
@@ -57,19 +58,7 @@ const NavBar: React.FC = () => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8"
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  <span className="sr-only">Orders</span>
-                </a>
-              </TooltipTrigger>
-              <TooltipContent side="right">Orders</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <a
-                  href="#"
+                  href="/courses"
                   className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <Package className="h-5 w-5" />
@@ -80,15 +69,15 @@ const NavBar: React.FC = () => {
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <a
-                  href="#"
+                <Link
+                  to={`/admin`}
                   className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                 >
                   <Users2 className="h-5 w-5" />
-                  <span className="sr-only">Customers</span>
-                </a>
+                  <span className="sr-only">Admin</span>
+                </Link>
               </TooltipTrigger>
-              <TooltipContent side="right">Customers</TooltipContent>
+              <TooltipContent side="right">Admin</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>

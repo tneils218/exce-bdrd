@@ -26,7 +26,7 @@ const CustomFormDialog = (props: any) => {
         setFormData({ ...formData, [field]: file });
       } else {
         // Nếu không có tệp nào được chọn
-        console.log("No file selected");
+        alert("No file selected");
       }
     }
     setFormData({ ...formData, [field]: e.target.value });
@@ -47,14 +47,14 @@ const CustomFormDialog = (props: any) => {
         isOpen.func === "Assign" ||
         isOpen.func === "Delete"
       ) {
-        updatedFormData = { id: isOpen.id, ...updatedFormData };
+        updatedFormData = { id: isOpen.id,userId :"cf0d1146-8415-4b9a-812c-3322f3245be2", ...updatedFormData };
         console.log(updatedFormData);
       }
 
       if (isOpen.func === "Add") {
         var user = JSON.parse(localStorage.getItem("user"));
         console.log(user);
-        updatedFormData = { userId: user.email, ...updatedFormData };
+        updatedFormData = { userId :"cf0d1146-8415-4b9a-812c-3322f3245be2", ...updatedFormData };
         console.log(updatedFormData);
       }
       // Check if userId exists and is not empty
