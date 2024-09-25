@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import courseApi from "@/api/course.api";
 
 export interface Exam {
@@ -78,15 +78,18 @@ const initCourses = [
 const CoursePage = () => {
   const [courses, setCourses] = useState<Course[]>(initCourses);
 
-  async function fetchCourses() {
-    try {
-      const res = await courseApi.getAll();
-      setCourses(res.data);
-    } catch (error) {
-      console.error("Error fetching courses:", error);
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await courseApi.getAll();
+        setCourses(res.data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
     }
-  }
-  fetchCourses();
+    fetchCourses();
+  },[])
+  
   return (
     <div className="dark:bg-slate-800 bg-slate-300 min-h-screen p-8">
       <div className="flex flex-col sm:gap-12 sm:py-4 sm:pl-20">

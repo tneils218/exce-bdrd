@@ -3,9 +3,6 @@ import {
   FaBook,
   FaCheckCircle,
   FaChevronRight,
-  FaCode,
-  FaLayerGroup,
-  FaServer,
 } from "react-icons/fa";
 import { Course } from "./CoursePage";
 
@@ -13,19 +10,6 @@ const ExamsPage = () => {
   const location = useLocation();
   const course = location.state as Course;
   const navigate = useNavigate();
-
-  const renderExamIcon = (type: string) => {
-    switch (type) {
-      case "MVC":
-        return <FaLayerGroup className="text-blue-500" />;
-      case "Console":
-        return <FaCode className="text-green-500" />;
-      case "API":
-        return <FaServer className="text-purple-500" />;
-      default:
-        return <FaBook className="text-gray-500" />;
-    }
-  };
 
   if (!course) {
     return (
@@ -38,6 +22,7 @@ const ExamsPage = () => {
           return to the course list.
         </p>
         <button
+          type="button"
           onClick={() => navigate("/")}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
         >
@@ -54,7 +39,8 @@ const ExamsPage = () => {
           {course.title}
         </h2>
         <button
-          onClick={() => navigate("/courses")}
+          type="button"
+          onClick={() => navigate("/")}
           className="text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 transition duration-300"
         >
           &times;
@@ -76,7 +62,7 @@ const ExamsPage = () => {
               className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-700 rounded-lg transition duration-300 hover:bg-gray-200 dark:hover:bg-slate-600"
             >
               <div className="flex items-center">
-                {renderExamIcon(exam.type)}
+                <FaBook className="text-gray-500" />;
                 <span className="font-medium ml-3 text-gray-700 dark:text-gray-300">
                   {exam.title}
                 </span>
