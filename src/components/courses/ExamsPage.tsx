@@ -7,13 +7,14 @@ import {
   FaLayerGroup,
   FaServer,
 } from "react-icons/fa";
+import { Course } from "./CoursePage";
 
-const ChaptersPage = () => {
+const ExamsPage = () => {
   const location = useLocation();
-  const course = location.state; // Retrieving the course object from state
+  const course = location.state as Course; 
   const navigate = useNavigate();
 
-  const renderChapterIcon = (type: string) => {
+  const renderExamIcon = (type: string) => {
     switch (type) {
       case "MVC":
         return <FaLayerGroup className="text-blue-500" />;
@@ -27,7 +28,20 @@ const ChaptersPage = () => {
   };
 
   if (!course) {
-    return <div>Course not found</div>;
+    return (
+      <div className="bg-slate-300 dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl mx-auto mt-8 p-6">
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Course Not Found</h2>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          The requested course could not be found. Please check the URL or return to the course list.
+        </p>
+        <button
+          onClick={() => navigate("/courses")}
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
+        >
+          Return to Courses
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -45,24 +59,24 @@ const ChaptersPage = () => {
       </div>
       <p className="text-gray-600 dark:text-gray-400 mb-6">{course.description}</p>
       <ul>
-        {course.chapters.map((chapter: any) => (
+        {course.exams.map((exam: any) => (
           <Link
-            to={course.title === "Console" ? `/exercies/${chapter.id}` : "/"}
-            state={chapter}
+            to={course.label === "Console" ? `/exercises/${exam.id}` : "/"}
+            state={exam}
             className="block mb-[1px]"
           >
             <li
-              key={chapter.id}
+              key={exam.id}
               className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-700 rounded-lg transition duration-300 hover:bg-gray-200 dark:hover:bg-slate-600"
             >
               <div className="flex items-center">
-                {renderChapterIcon(chapter.type)}
+                {renderExamIcon(exam.type)}
                 <span className="font-medium ml-3 text-gray-700 dark:text-gray-300">
-                  {chapter.title}
+                  {exam.title}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                {chapter.completed && (
+                {exam.isComplete && (
                   <FaCheckCircle className="text-green-500" />
                 )}
                 <FaChevronRight className="text-gray-400 dark:text-gray-500" />
@@ -75,4 +89,4 @@ const ChaptersPage = () => {
   );
 };
 
-export default ChaptersPage;
+export default ExamsPage;

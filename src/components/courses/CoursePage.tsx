@@ -1,6 +1,22 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 
+export interface Exam {
+  id: number;
+  title: string;
+  type: string;
+  isComplete: boolean;
+}
+
+export interface Course {
+  id: number;
+  title: string;
+  description: string;
+  imageUrl: string;
+  label: string;
+  exams: Exam[];
+}
+
 const CoursePage = () => {
   const [courses] = useState([
     {
@@ -9,10 +25,10 @@ const CoursePage = () => {
       description: "Model-Views-Controller",
       image:
         "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      chapters: [
-        { id: 1, completed: true, title: "MVC", content: "Đề bài 1" },
-        { id: 2, completed: false, title: "Console", content: "Đề bài 2" },
-        { id: 3, completed: false, title: "API", content: "Đề bài 3" },
+      exams: [
+        { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
+        { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
+        { id: 3, isComplete: false, title: "API", content: "Đề bài 3" },
       ],
     },
     {
@@ -21,10 +37,11 @@ const CoursePage = () => {
       description: "Basic console exercises",
       image:
         "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      chapters: [
-        { id: 1, completed: true, title: "MVC", content: "Đề bài 1" },
-        { id: 2, completed: false, title: "Console", content: "Đề bài 2" },
-        { id: 3, completed: false, title: "API", content: "Đề bài 3" },
+      label: "Console",
+      exams: [
+        { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
+        { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
+        { id: 3, isComplete: true, title: "API", content: "Đề bài 3" },
       ],
     },
     {
@@ -33,10 +50,10 @@ const CoursePage = () => {
       description: "Practice writing API and WEB API",
       image:
         "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      chapters: [
-        { id: 1, completed: true, title: "MVC", content: "Đề bài 1" },
-        { id: 2, completed: false, title: "Console", content: "Đề bài 2" },
-        { id: 3, completed: false, title: "API", content: "Đề bài 3" },
+      exams: [
+        { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
+        { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
+        { id: 3, isComplete: false, title: "API", content: "Đề bài 3" },
       ],
     },
     {
@@ -45,11 +62,11 @@ const CoursePage = () => {
       description: "Learn about Kafka",
       image:
         "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      chapters: [
-        { id: 1, completed: true, title: "MVC", content: "Đề bài 1" },
-        { id: 2, completed: false, title: "Console", content: "Đề bài 2" },
-        { id: 3, completed: false, title: "API", content: "Đề bài 3" },
-        { id: 4, completed: false, title: "API", content: "Đề bài 4" },
+      exams: [
+        { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
+        { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
+        { id: 3, isComplete: true, title: "API", content: "Đề bài 3" },
+        { id: 4, isComplete: false, title: "API", content: "Đề bài 4" },
       ],
     },
   ]);
@@ -83,7 +100,7 @@ const CoursePage = () => {
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {course.chapters.length} exercises
+                      {course.exams.length} exercises
                     </span>
                   </div>
                 </div>

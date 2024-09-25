@@ -17,7 +17,7 @@ export const routes: AppRoute[] = [
   },
   {
     path: "/course/:id",
-    element: () => import("@/components/courses/ChaptersPage.tsx"),
+    element: () => import("@/components/courses/ExamsPage"),
     showNavBar: true,
     isProtected: false,
   },
@@ -40,7 +40,7 @@ export const routes: AppRoute[] = [
     isProtected: false,
   },
   {
-    path: "/exercies/:id",
+    path: "/exercises/:id",
     element: () => import("@/components/editor/CodeEditorDetail"),
     showNavBar: true,
     isProtected: false,
