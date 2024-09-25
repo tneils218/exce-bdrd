@@ -11,7 +11,7 @@ import { Course } from "./CoursePage";
 
 const ExamsPage = () => {
   const location = useLocation();
-  const course = location.state as Course; 
+  const course = location.state as Course;
   const navigate = useNavigate();
 
   const renderExamIcon = (type: string) => {
@@ -30,12 +30,15 @@ const ExamsPage = () => {
   if (!course) {
     return (
       <div className="bg-slate-300 dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl mx-auto mt-8 p-6">
-        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Course Not Found</h2>
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">
+          Course Not Found
+        </h2>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
-          The requested course could not be found. Please check the URL or return to the course list.
+          The requested course could not be found. Please check the URL or
+          return to the course list.
         </p>
         <button
-          onClick={() => navigate("/courses")}
+          onClick={() => navigate("/")}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
         >
           Return to Courses
@@ -57,10 +60,13 @@ const ExamsPage = () => {
           &times;
         </button>
       </div>
-      <p className="text-gray-600 dark:text-gray-400 mb-6">{course.description}</p>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        {course.description}
+      </p>
       <ul>
         {course.exams.map((exam: any) => (
           <Link
+            key={exam.id}
             to={course.label === "Console" ? `/exercises/${exam.id}` : "/"}
             state={exam}
             className="block mb-[1px]"
