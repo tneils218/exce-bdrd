@@ -1,10 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  FaBook,
-  FaCheckCircle,
-  FaChevronRight,
-} from "react-icons/fa";
-import { Course } from "./CoursePage";
+import { FaBook, FaCheckCircle, FaChevronRight } from "react-icons/fa";
+import { Course, Exam } from "./CoursePage";
 
 const ExamsPage = () => {
   const location = useLocation();
@@ -50,7 +46,7 @@ const ExamsPage = () => {
         {course.description}
       </p>
       <ul>
-        {course.exams.map((exam: any) => (
+        {course.exams.map((exam: Exam) => (
           <Link
             key={exam.id}
             to={course.label === "Console" ? `/exercises/${exam.id}` : "/"}
@@ -58,11 +54,10 @@ const ExamsPage = () => {
             className="block mb-[1px]"
           >
             <li
-              key={exam.id}
               className="flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-700 rounded-lg transition duration-300 hover:bg-gray-200 dark:hover:bg-slate-600"
             >
               <div className="flex items-center">
-                <FaBook className="text-gray-500" />;
+                <FaBook className="text-gray-500" />
                 <span className="font-medium ml-3 text-gray-700 dark:text-gray-300">
                   {exam.title}
                 </span>
