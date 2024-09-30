@@ -12,22 +12,22 @@ const examApi = {
           "Content-Type": "multipart/form-data",
         },
       });
-    }   
+    }
   },
   edit(payload: FormData) {
     {
-      return axiosClient.put(baseUrl, payload, {
+      const url = `${baseUrl}/${payload.id}`;
+      return axiosClient.put(url, payload, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-    }   
+    }
   },
   delete(id: number) {
     const url = `${baseUrl}/${id}`;
     return axiosClient.delete(url);
   },
-
 };
 
 export default examApi;

@@ -22,7 +22,8 @@ const courseApi = {
   },
   edit(payload: FormData) {
     {
-      return axiosClient.put(baseUrl, payload, {
+      const url = `${baseUrl}/${payload.id}`;
+      return axiosClient.put(url, payload, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

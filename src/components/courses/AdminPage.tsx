@@ -14,7 +14,6 @@ import { ToastContainer, toast } from "react-toastify";
 import { z } from "zod";
 import CustomForm from "../customForm/customForm";
 import { Course, Exam } from "./CoursePage"; // Assuming Course and Exam are defined in CoursePage
-import { Button } from "../ui/button";
 
 const courseSchema = (isEdit: boolean) =>
   z.object({
@@ -52,12 +51,10 @@ const examSchema = z.object({
 
 const AdminPage = () => {
   const [courses, setCourses] = useState<Course[]>([]);
-  const [newExam, setNewExam] = useState({});
   const [isEdit, setIsEdit] = useState(false);
   const [expandedCourse, setExpandedCourse] = useState<number | null>(null);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
-  const [addExam, setAddExam] = useState<Exam | null>(null);
   const [openAddExam, setOpenAddExam] = useState(false);
   const [examPages, setExamPages] = useState({});
   const examsPerPage = 3;
@@ -108,10 +105,10 @@ const AdminPage = () => {
     });
   };
 
-  const handleEditCourse = (formData: FormData) => {
+  const handleEditCourse = async (formData: FormData) => {
     formData.append("id", editingCourse.id);
     try {
-      courseApi.edit(formData).then(() => {
+      await courseApi.edit(formData).then(() => {
         notify("Course edited successfully!");
         setReloadData(true);
       });
@@ -140,7 +137,6 @@ const AdminPage = () => {
     formData.append("courseId", expandedCourse);
     examApi.add(formData).then(() => {
       notify("Exam added successfully!");
-      setNewExam({ title: "", content: "" });
       setReloadData(true);
       setOpenAddExam(false);
     });
