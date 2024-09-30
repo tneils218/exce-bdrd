@@ -1,30 +1,30 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaBook, FaCheckCircle, FaChevronRight } from "react-icons/fa";
 import { Course, Exam } from "./CoursePage";
+import courseApi from "@/api/course.api";
+import { useEffect, useState } from "react";
 
 const ExamsPage = () => {
   const location = useLocation();
-  const course = location.state as Course;
+  const [course,setCourse] = useState<Course | null>(null);;
+  const courseId = location.state as number;
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await courseApi.getById(courseId);
+        setCourse(res.data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    }
+    fetchCourses();
+    
+  },[])
   const navigate = useNavigate();
-
+  console.log(course);
   if (!course) {
     return (
-      <div className="bg-slate-300 dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-2xl mx-auto mt-8 p-6">
-        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">
-          Course Not Found
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
-          The requested course could not be found. Please check the URL or
-          return to the course list.
-        </p>
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition duration-300"
-        >
-          Return to Courses
-        </button>
-      </div>
+      <p> Loading...</p>
     );
   }
 
@@ -49,8 +49,8 @@ const ExamsPage = () => {
         {course.exams.map((exam: Exam) => (
           <Link
             key={exam.id}
-            to={course.label === "Console" ? `/exercises/${exam.id}` : "/"}
-            state={exam}
+            to={course.label === "Console" ? `/exercises/${exam.id}` : `/submit/${exam.id}`}
+            state={{exam: exam, courseId : course.id}}
             className="block mb-[1px]"
           >
             <li

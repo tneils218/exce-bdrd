@@ -11,7 +11,7 @@ interface AppRoute {
 export const routes: AppRoute[] = [
   {
     path: "/",
-    element: () => import("@/components/courses/CoursePage.tsx"),
+    element: () => import("@/components/courses/CoursePage"),
     showNavBar: true,
     isProtected: false,
   },
@@ -42,6 +42,18 @@ export const routes: AppRoute[] = [
   {
     path: "/exercises/:id",
     element: () => import("@/components/editor/CodeEditorDetail"),
+    showNavBar: true,
+    isProtected: false,
+  },
+  {
+    path: "/submit/:id",
+    element: () => import("@/components/courses/HandInExamsPage"),
+    showNavBar: true,
+    isProtected: false,
+  },
+  {
+    path: "/admin",
+    element: () => import("@/components/courses/AdminPage"),
     showNavBar: true,
     isProtected: false,
   },

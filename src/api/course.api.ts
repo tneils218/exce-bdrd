@@ -7,9 +7,31 @@ const courseApi = {
     return axiosClient.get<Course[]>(baseUrl);
   },
 
-  getById(id: string) {
+  getById(id: number) {
     const url = `${baseUrl}/${id}`;
     return axiosClient.get<Course>(url);
+  },
+  add(payload: FormData) {
+    {
+      return axiosClient.post(baseUrl, payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+  },
+  edit(payload: FormData) {
+    {
+      return axiosClient.put(baseUrl, payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    }
+  },
+  delete(id: number) {
+    const url = `${baseUrl}/${id}`;
+    return axiosClient.delete(url);
   },
 };
 
