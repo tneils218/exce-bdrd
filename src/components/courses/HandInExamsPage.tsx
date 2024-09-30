@@ -19,11 +19,10 @@ const HandInExamsPage = () => {
   const fields = [{ name: "exam", type: "file", accept: "" }];
   const location = useLocation();
   const state = location.state;
-  console.log(state);
 
   const handleAddCourse = (formData: FormData) => {
     let user: any;
-    let userJson = localStorage.getItem("user");
+    const userJson = localStorage.getItem("user");
     if (userJson) user = JSON.parse(userJson);
     formData.append("userId", user.id);
     formData.append("examId", state.exam.id);

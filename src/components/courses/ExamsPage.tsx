@@ -43,7 +43,7 @@ const ExamsPage = () => {
         </button>
       </div>
       <p className="text-gray-600 dark:text-gray-400 mb-6">
-        {course.description}
+        {course.desc}
       </p>
       <ul>
         {course.exams.map((exam: Exam) => (

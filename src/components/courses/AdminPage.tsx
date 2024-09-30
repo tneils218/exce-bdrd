@@ -94,15 +94,21 @@ const AdminPage = () => {
   }, []);
 
   const handleAddCourse = (formData: FormData) => {
-    let user: any;
-    let userJson = localStorage.getItem("user");
-    if (userJson) user = JSON.parse(userJson);
-
-    formData.append("userId", user.id);
-    courseApi.add(formData).then(() => {
-      notify("Course added successfully!");
-      setReloadData(true);
-    });
+    try {
+      let user: any;
+      let userJson = localStorage.getItem("user");
+      if (userJson) user = JSON.parse(userJson);
+  
+      formData.append("userId", user.id);
+      courseApi.add(formData).then(() => {
+        notify("Course added successfully!");
+        setReloadData(true);
+      });
+    }
+    catch
+     {
+      notify("Something wen wrong when you try to add course, try again!");
+    }
   };
 
   const handleEditCourse = async (formData: FormData) => {
@@ -111,11 +117,12 @@ const AdminPage = () => {
       await courseApi.edit(formData).then(() => {
         notify("Course edited successfully!");
         setReloadData(true);
+        setEditingCourse(null);
       });
-    } catch {
-      notify("Something happened, try again!");
+    } catch
+     {
+      notify("Something wen wrong when you try to edit course, try again!");
     }
-    setEditingCourse(null);
   };
 
   const toggleCourseExpansion = (courseId: number) => {
@@ -134,30 +141,43 @@ const AdminPage = () => {
   };
 
   const handleAddExam = (formData: FormData) => {
-    formData.append("courseId", expandedCourse);
-    examApi.add(formData).then(() => {
-      notify("Exam added successfully!");
-      setReloadData(true);
-      setOpenAddExam(false);
-    });
+    try {
+      formData.append("courseId", expandedCourse);
+      examApi.add(formData).then(() => {
+        notify("Exam added successfully!");
+        setReloadData(true);
+        setOpenAddExam(false);
+      });
+    } catch {
+      notify("Something went wrong when you try to add exam, try again!");
+    }
   };
 
   const handleEditExam = (formData: FormData) => {
-    formData.append("courseId", editingExam.courseId);
-    formData.append("id", editingExam.exam.id);
-    examApi.edit(formData).then(() => {
-      notify("Exam edited successfully!");
-      setEditingExam(null);
-      setReloadData(true);
-    });
+    try {
+      formData.append("courseId", editingExam.courseId);
+      formData.append("id", editingExam.exam.id);
+      examApi.edit(formData).then(() => {
+        notify("Exam edited successfully!");
+        setEditingExam(null);
+        setReloadData(true);
+      });
+    } catch {
+      notify("Something went wrong when you try to edit exam, try again!");
+    }
   };
 
   const handleDeleteExam = (id: number) => {
-    examApi.delete(id).then(() => {
-      notify("Exam deleted successfully!");
-      setReloadData(true);
-    });
+    try {
+      examApi.delete(id).then(() => {
+        notify("Exam deleted successfully!");
+        setReloadData(true);
+      });
+    } catch {
+      notify("Something went wrong when you try to delete exam, try again!");
+    }
   };
+
   return (
     <div className="dark:bg-slate-800 bg-slate-300 min-h-screen pl-20 pr-5">
       <ToastContainer />
@@ -172,7 +192,7 @@ const AdminPage = () => {
           schema={courseSchema(false)}
           fields={courseFields}
           onSubmit={handleAddCourse}
-          defaultValues={{ title: "", description: "", label: "", image: null }}
+          defaultValues={{ title: "", desc: "", label: "", image: null }}
         />
       </div>
 
@@ -219,7 +239,7 @@ const AdminPage = () => {
             {expandedCourse === course.id && (
               <div className="mt-4">
                 <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {course.description}
+                  {course.desc}
                 </p>
                 <h4 className="font-semibold mb-2">Exams:</h4>
                 <ul className="space-y-2">
