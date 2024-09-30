@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import courseApi from "@/api/course.api";
 
+
 export interface Exam {
   id: number;
   title: string;
+  courseId: number;
   content: string;
   isComplete: boolean;
 }
@@ -18,70 +20,15 @@ export interface Course {
   exams: Exam[];
 }
 
-const initCourses = [
-  {
-    id: 1,
-    title: "MVC",
-    description: "Model-Views-Controller",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    label: "MVC",
-    exams: [
-      { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
-      { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
-      { id: 3, isComplete: false, title: "API", content: "Đề bài 3" },
-    ],
-  },
-  {
-    id: 2,
-    title: "Console",
-    description: "Basic console exercises",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-
-    label: "Console",
-    exams: [
-      { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
-      { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
-      { id: 3, isComplete: true, title: "API", content: "Đề bài 3" },
-    ],
-  },
-  {
-    id: 3,
-    title: "WEB API",
-    description: "Practice writing API and WEB API",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    label: "MVC",
-    exams: [
-      { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
-      { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
-      { id: 3, isComplete: false, title: "API", content: "Đề bài 3" },
-    ],
-  },
-  {
-    id: 4,
-    title: "Kafka",
-    description: "Learn about Kafka",
-    imageUrl:
-      "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-    label: "MVC",
-    exams: [
-      { id: 1, isComplete: true, title: "MVC", content: "Đề bài 1" },
-      { id: 2, isComplete: false, title: "Console", content: "Đề bài 2" },
-      { id: 3, isComplete: true, title: "API", content: "Đề bài 3" },
-      { id: 4, isComplete: false, title: "API", content: "Đề bài 4" },
-    ],
-  },
-];
 
 const CoursePage = () => {
-  const [courses, setCourses] = useState<Course[]>(initCourses);
+  const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     async function fetchCourses() {
       try {
         const res = await courseApi.getAll();
+        console.log(res.data);
         setCourses(res.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -101,7 +48,7 @@ const CoursePage = () => {
             <Link
               key={course.id}
               to={`/course/${course.id}`}
-              state={course}
+              state={course.id}
               aria-label={`View details for ${course.title} course`}
               className="text-white font-bold py-2 px-4 rounded transition duration-300"
             >
