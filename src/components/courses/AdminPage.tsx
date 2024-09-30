@@ -93,14 +93,14 @@ const AdminPage = () => {
     fetchCourses();
   }, []);
 
-  const handleAddCourse = (formData: FormData) => {
+  const handleAddCourse = async (formData: FormData) => {
     try {
       let user: any;
       let userJson = localStorage.getItem("user");
       if (userJson) user = JSON.parse(userJson);
   
       formData.append("userId", user.id);
-      courseApi.add(formData).then(() => {
+    await courseApi.add(formData).then(() => {
         notify("Course added successfully!");
         setReloadData(true);
       });

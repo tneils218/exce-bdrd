@@ -14,7 +14,7 @@ export interface Exam {
 export interface Course {
   id: number;
   title: string;
-  description: string;
+  desc: string;
   imageUrl: string;
   label: string;
   exams: Exam[];
@@ -64,7 +64,7 @@ const CoursePage = () => {
                     {course.title}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    {course.description}
+                    {course.desc}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500 dark:text-gray-400">
