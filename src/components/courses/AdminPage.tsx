@@ -9,11 +9,10 @@ import {
 } from "react-icons/fa";
 import courseApi from "@/api/course.api";
 import examApi from "@/api/exam.api";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
 import { z } from "zod";
 import CustomForm from "../customForm/customForm";
 import { Course, Exam } from "./CoursePage"; // Assuming Course and Exam are defined in CoursePage
+import { notify } from "@/commons/notify";
 
 const courseSchema = (isEdit: boolean) =>
   z.object({
@@ -71,7 +70,6 @@ const AdminPage = () => {
     { name: "file", type: "file" },
   ]);
   const [reloadData, setReloadData] = useState(false);
-  const notify = (message: string) => toast(message);
 
   const fetchCourses = async () => {
     try {
@@ -112,8 +110,8 @@ const AdminPage = () => {
   };
 
   const handleEditCourse = async (formData: FormData) => {
-    formData.append("id", editingCourse.id);
     try {
+    formData.append("id", editingCourse?.id);
       await courseApi.edit(formData).then(() => {
         notify("Course edited successfully!");
         setReloadData(true);
@@ -124,6 +122,18 @@ const AdminPage = () => {
       notify("Something wen wrong when you try to edit course, try again!");
     }
   };
+
+  const handleDeleteCourse = async (id: number ) => {
+    try {
+      await courseApi.delete(id).then(() => {
+        notify("Course deleted successfully!");
+        setReloadData(true);
+      });
+    } catch
+     {
+      notify("Something wen wrong when you try to delete course, try again!");
+    }
+  }
 
   const toggleCourseExpansion = (courseId: number) => {
     setExpandedCourse(expandedCourse === courseId ? null : courseId);
@@ -180,7 +190,6 @@ const AdminPage = () => {
 
   return (
     <div className="dark:bg-slate-800 bg-slate-300 min-h-screen pl-20 pr-5">
-      <ToastContainer />
       <h1 className="text-3xl font-bold mb-6 text-center dark:text-gray-200 text-gray-800">
         Admin - Courses and Exams
       </h1>
@@ -221,6 +230,7 @@ const AdminPage = () => {
               <div className="space-x-2">
                 <button
                   onClick={() => {
+                    console.log(course);
                     setEditingCourse(course);
                     setIsEdit(true);
                   }}
@@ -229,7 +239,7 @@ const AdminPage = () => {
                   <FaEdit />
                 </button>
                 <button
-                  onClick={() => courseApi.delete(course.id)}
+                  onClick={() => handleDeleteCourse(course.id)}
                   className="text-red-500 dark:text-red-400 hover:text-red-700"
                 >
                   <FaTrash />

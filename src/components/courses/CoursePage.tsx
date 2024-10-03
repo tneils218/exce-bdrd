@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import courseApi from "@/api/course.api";
 
-
 export interface Exam {
   id: number;
   title: string;
@@ -28,7 +27,6 @@ const CoursePage = () => {
     async function fetchCourses() {
       try {
         const res = await courseApi.getAll();
-        console.log(res.data);
         setCourses(res.data);
       } catch (error) {
         console.error("Error fetching courses:", error);

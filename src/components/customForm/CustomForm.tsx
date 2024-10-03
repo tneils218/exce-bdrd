@@ -33,12 +33,14 @@ const CustomForm: React.FC<GenericFormProps> = ({
   
     const handleFormSubmit: SubmitHandler<any> = (data) => {
       const formData = new FormData();
+      console.log(data);
       Object.keys(data).forEach((key) => {
-        if (key !== "image") {
+        if (key !== "image" && key !== "imageUrl") {
           formData.append(key, data[key]);
         }
       });
       if (file) {
+        console.log(file);
         formData.append("image", file);
       }
       onSubmit(formData);

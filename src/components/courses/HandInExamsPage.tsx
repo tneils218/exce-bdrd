@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import CustomForm from "../customForm/customForm";
 import { z } from "zod";
 import submissionApi from "@/api/submission.api";
+import { notify } from "@/commons/notify";
 
 const schema = z.object({
   exam: z
@@ -20,13 +21,20 @@ const HandInExamsPage = () => {
   const location = useLocation();
   const state = location.state;
 
-  const handleAddCourse = (formData: FormData) => {
-    let user: any;
-    const userJson = localStorage.getItem("user");
-    if (userJson) user = JSON.parse(userJson);
-    formData.append("userId", user.id);
-    formData.append("examId", state.exam.id);
-    submissionApi.submit(formData);
+  const handleAddExam = (formData: FormData) => {
+    try{
+      let user: any;
+      const userJson = localStorage.getItem("user");
+      if (userJson) user = JSON.parse(userJson);
+      formData.append("userId", user.id);
+      formData.append("examId", state.exam.id);
+      submissionApi.submit(formData);
+      notify("Add exam successed!");
+    }
+    catch {
+      notify("Something happended while adding exam, please try again!");
+    }
+  
   };
 
   return (
@@ -56,7 +64,7 @@ const HandInExamsPage = () => {
             <CustomForm
               schema={schema}
               fields={fields}
-              onSubmit={handleAddCourse}
+              onSubmit={handleAddExam}
               defaultValues={{
                 exam: null,
               }}
