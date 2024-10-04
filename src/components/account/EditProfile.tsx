@@ -1,103 +1,126 @@
 import { FaUserAlt, FaPhone, FaUpload } from "react-icons/fa";
-import { useForm, SubmitHandler, Form } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
 import { Input } from "../ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import userApi from "@/api/user.api";
 import { notify } from "@/commons/notify";
 import { StatusCode } from "@/commons/utils";
+import axios from "axios";
 
 // Define schema using zod
-const schema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  phoneNumber: z
-    .string()
-    .min(1, "Phone number is required")
-    .regex(/^0\d{9}$/, "Invalid phone number format, example 0123456789"),
-  dob: z
-    .string()
-    .transform((val) => new Date(val)) // Transform string to Date
-    .refine((val) => new Date(val) < new Date(), "Invalid date"), // Ensure it's a valid Date
-  avatar: z
-    .any()
-    .refine(
-      (file) => file?.[0], // Chỉ yêu cầu file nếu không phải đang chỉnh sửa
-      "Image is required"
-    )
-    .refine(
-      (file) => file?.[0]?.size <= 5000000,
-      "File size must be less than 5MB"
-    )
-    .refine(
-      (file) =>
-        ["image/jpeg", "image/png", "image/gif"].includes(file?.[0]?.type),
-      "File format must be JPG, PNG, or GIF"
-    ),
-});
-
-
 const EditProfile = (props: any) => {
   const { user, setIsEditing } = props;
   const [file, setFile] = useState<File | null>(null);
   const [birthDate, setBirthDate] = useState(() => {
     if (user.dob) {
-      const [day, month, year] = user.dob.split("/").map(Number); // Tách chuỗi theo dấu '/'
-      return new Date(year, month - 1, day); // Month trong JavaScript bắt đầu từ 0
-    }
-    return null; // Nếu không có dob, trả về null
+      console.log(user.dob);
+      const [day, month, year] = user.dob.split("-").map(Number); 
+      console.log(day, month, year);
+      return new Date(year, month - 1, day); 
+    } 
+    return null; 
   });
-  const [tempAvatarUrl, setTempAvatarUrl] = useState('');
+  const [tempAvatarUrl, setTempAvatarUrl] = useState("");
 
+  console.log(birthDate);
+  const [avatarBlob, setAvatarBlob] = useState<Blob | null>(null);
+
+  const schema = z.object({
+    fullName: z.string().min(1, "Full name is required"),
+    phoneNumber: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^0\d{9}$/, "Invalid phone number format, example 0123456789"),
+    dob: z
+      .string()
+      .transform((val) => new Date(val)) // Transform string to Date
+      .refine((val) => new Date(val) < new Date(), "Invalid date"), // Ensure it's a valid Date
+      avatar: z
+      .any()
+      .refine(
+        (file) => {
+          if (!user.avatarUrl) {
+            return file?.[0]; 
+          }
+          return true; 
+        },
+        "Image is required"
+      )
+      .refine(
+        (file) => {
+          if (file?.[0]) {
+            return file?.[0]?.size <= 5000000;
+          }
+          return true; 
+        },
+        "File size must be less than 5MB"
+      )
+      .refine(
+        (file) => {
+          if (file?.[0]) {
+            return ["image/jpeg", "image/png", "image/gif"].includes(file?.[0]?.type);
+          }
+          return true; // Không cần validate nếu không có file mới
+        },
+        "File format must be JPG, PNG, or GIF"
+      ),
+  });
+  // Sử dụng useEffect để tải ảnh avatar từ URL khi component khởi tạo
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      const res = await axios.get(user.avatarUrl, {
+        responseType: "blob",
+      });
+      setAvatarBlob(res.data); // Lưu blob để sử dụng trong form
+    };
+    fetchAvatar();
+  }, []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    control,
   } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       fullName: user.fullName,
       phoneNumber: user.phoneNumber,
       dob: user.dob,
-      avatar: null,
+      avatar: avatarBlob,
     },
   });
 
-
-  const handleAvatarChange =  (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileVal = e.target.files?.[0];
-    if (fileVal) {
-      setFile(fileVal);
-    }
-  }
+      if (fileVal) {
+        setFile(fileVal);
+        setTempAvatarUrl(URL.createObjectURL(fileVal));
+      }
+  };
 
-  const onSubmit: SubmitHandler<any> = async  (data: any) => {
-    try{
-        const formData = new FormData();
-        formData.append("fullName", data.fullName);
-        formData.append("phoneNumber", data.phoneNumber);
-        formData.append("dob", birthDate ? formatDate(birthDate, "dmy") : ""); // Chuyển đổi thành định dạng yyyy-MM-dd
-        if (file) formData.append("file", file);
-        let user;
-        const userJson = localStorage.getItem("user");
-        if (userJson) user = JSON.parse(userJson);
-        formData.append("id", user.id);
-       const updateResponse = await userApi.update(user.id, formData);
-       if(updateResponse.status == StatusCode.OK) {
-        const response =  await userApi.getById(user.id);
-        localStorage.setItem("user", JSON.stringify(response.data))
-         notify("Edit profile successed!");
-         setIsEditing(false);
-       } else notify(JSON.parse(updateResponse.data).message)
-     
-     }
-    catch {
-        notify("Something went wrong while edit profile, try again!");
+  const onSubmit: SubmitHandler<any> = async (data: any) => {
+    try {
+      const formData = new FormData();
+      formData.append("fullName", data.fullName);
+      formData.append("phoneNumber", data.phoneNumber);
+      formData.append("dob", birthDate ? formatDate(birthDate, "dmy") : ""); // Chuyển đổi thành định dạng yyyy-MM-dd
+      if (file) formData.append("file", file);
+      else formData.append("file",avatarBlob);
+      let user;
+      const userJson = localStorage.getItem("user");
+      if (userJson) user = JSON.parse(userJson);
+      formData.append("id", user.id);
+      const updateResponse = await userApi.update(user.id, formData);
+      if (updateResponse.status == StatusCode.OK) {
+        notify("Edit profile successed!");
+        setIsEditing(false);
+      } else notify(JSON.parse(updateResponse.data).message);
+    } catch {
+      notify("Something went wrong while edit profile, try again!");
     }
-   
   };
 
   const formatDate = (date: Date, type: string) => {
@@ -108,16 +131,14 @@ const EditProfile = (props: any) => {
     return `${day}-${month}-${year}`;
   };
 
- 
   return (
     <div className="dark:bg-slate-700 bg-white shadow sm:rounded-lg">
       <div className="px-4 py-5 sm:p-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900 mb-6 dark:text-gray-200 ">
           Edit Profile
         </h3>
-        <Form
-          onSubmit={handleSubmit(onSubmit)} 
-          control={control}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
           className="space-y-6"
         >
           <div>
@@ -189,7 +210,7 @@ const EditProfile = (props: any) => {
                 type="date"
                 {...register("dob")}
                 id="dob"
-                value={birthDate ? formatDate(birthDate, "ymd") : ""} // Sử dụng hàm formatDate
+                value={birthDate ? formatDate(birthDate, "ymd") : ""} 
                 onChange={(e) => setBirthDate(new Date(e.target.value))}
                 className="dark:bg-slate-600 dark:text-gray-200 dark:border-slate-500"
               />
@@ -207,7 +228,13 @@ const EditProfile = (props: any) => {
               Avatar
             </label>
             <div className="mt-1 flex items-center space-x-4">
-              {user.avatarUrl ? (
+              {tempAvatarUrl ? (
+                <img
+                  src={tempAvatarUrl}
+                  alt="Avatar preview"
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              ) : user.avatarUrl ? (
                 <img
                   src={user.avatarUrl}
                   alt="Avatar preview"
@@ -227,7 +254,10 @@ const EditProfile = (props: any) => {
               >
                 {file ? ( // Kiểm tra xem đã có file được chọn chưa
                   <>{file.name}</>
-                ) : (
+                ) : user.avatarUrl ? (<>
+                  <FaUpload className="h-4 w-4 inline-block mr-2" /> Upload
+                  different avatar
+                </>) : (
                   <>
                     <FaUpload className="h-4 w-4 inline-block mr-2" /> Upload
                     new avatar
@@ -265,7 +295,7 @@ const EditProfile = (props: any) => {
               Save Changes
             </button>
           </div>
-        </Form>
+        </form>
       </div>
     </div>
   );

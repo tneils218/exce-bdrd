@@ -10,15 +10,16 @@ import {
 import courseApi from "@/api/course.api";
 import examApi from "@/api/exam.api";
 import { z } from "zod";
-import CustomForm from "../customForm/customForm";
+import CustomForm from "../customForm/CustomForm";
 import { Course, Exam } from "./CoursePage"; // Assuming Course and Exam are defined in CoursePage
 import { notify } from "@/commons/notify";
+import { handleFormData } from "@/commons/formDataHandler";
 
 const courseSchema = (isEdit: boolean) =>
   z.object({
-    title: z.string().nonempty("This is a required field"),
-    desc: z.string().nonempty("This is a required field"),
-    label: z.string().nonempty("This is a required field"),
+    title: z.string().nonempty("Title a required field"),
+    desc: z.string().nonempty("Description is a required field"),
+    label: z.string().nonempty("Label is a required field"),
     image: z
       .any()
       .refine(
@@ -55,20 +56,22 @@ const AdminPage = () => {
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [openAddExam, setOpenAddExam] = useState(false);
-  const [examPages, setExamPages] = useState({});
+  const [examPages, setExamPages] = useState<Record<number, number>>({});
+  const [defaultValues, setDefaultValues] = useState({});
   const examsPerPage = 3;
   const [courseFields] = useState([
-    { name: "title", type: "text", placeholder: "Course Title" },
-    { name: "desc", type: "text", placeholder: "Course Description" },
-    { name: "label", type: "text", placeholder: "Course Label" },
-    { name: "image", type: "file", accept: "image/*" },
+    { name: "title", type: "text", placeholder: "Course Title", label: "Title" },
+    { name: "desc",  type: "text", placeholder: "Course Description", label: "Description" },
+    { name: "label", type: "text", placeholder: "Course Label", label: "Label"},
+    { name: "image", type: "file", accept: "image/*", label: "Image" },
   ]);
 
   const [examFields] = useState([
-    { name: "title", type: "text", placeholder: "Exam Title" },
-    { name: "content", type: "text", placeholder: "Exam Content" },
-    { name: "file", type: "file" },
+    { name: "title",   type: "text", placeholder: "Exam Title",   label: "Title"  },
+    { name: "content", type: "text", placeholder: "Exam Content", label: "Content" },
+    { name: "file", type: "file", label: "File", multiple: true },
   ]);
+
   const [reloadData, setReloadData] = useState(false);
 
   const fetchCourses = async () => {
@@ -81,59 +84,67 @@ const AdminPage = () => {
   };
 
   useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  useEffect(() => {
     if (reloadData) {
       fetchCourses();
       setReloadData(false);
     }
   }, [reloadData]);
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  const handleAddCourse = async (formData: FormData) => {
+  const handleAddCourse = (data: any) => {
     try {
+      const formData = handleFormData(data);
+
       let user: any;
       let userJson = localStorage.getItem("user");
       if (userJson) user = JSON.parse(userJson);
-  
       formData.append("userId", user.id);
-    await courseApi.add(formData).then(() => {
+  
+      courseApi.add(formData).then(() => {
         notify("Course added successfully!");
         setReloadData(true);
       });
-    }
-    catch
-     {
+    } catch {
       notify("Something wen wrong when you try to add course, try again!");
     }
   };
 
-  const handleEditCourse = async (formData: FormData) => {
+  const handleOpenFormEditCourse = (course: any) => {
+    {
+      setEditingCourse(course);
+      setIsEdit(true);
+      setDefaultValues({title: "", desc: "", label: "", image: null });
+    }
+  };
+
+  const handleEditCourse =  (data: any) => {
     try {
-    formData.append("id", editingCourse?.id);
-      await courseApi.edit(formData).then(() => {
+      const formData = handleFormData(data);
+
+      formData.append("id", String(editingCourse?.id));
+      courseApi.edit(formData).then(() => {
         notify("Course edited successfully!");
         setReloadData(true);
         setEditingCourse(null);
       });
-    } catch
-     {
+    } catch {
       notify("Something wen wrong when you try to edit course, try again!");
     }
   };
 
-  const handleDeleteCourse = async (id: number ) => {
+  const handleDeleteCourse = async (id: number) => {
     try {
       await courseApi.delete(id).then(() => {
         notify("Course deleted successfully!");
         setReloadData(true);
       });
-    } catch
-     {
+    } catch {
       notify("Something wen wrong when you try to delete course, try again!");
     }
-  }
+  };
 
   const toggleCourseExpansion = (courseId: number) => {
     setExpandedCourse(expandedCourse === courseId ? null : courseId);
@@ -150,23 +161,27 @@ const AdminPage = () => {
     return course.exams.slice(indexOfFirstExam, indexOfLastExam);
   };
 
-  const handleAddExam = (formData: FormData) => {
+  const handleAddExam = (data: any) => {
     try {
-      formData.append("courseId", expandedCourse);
+      const formData = handleFormData(data);
+      console.log("hello");
+      formData.append("courseId", String(expandedCourse));
       examApi.add(formData).then(() => {
         notify("Exam added successfully!");
         setReloadData(true);
         setOpenAddExam(false);
+        setDefaultValues({ title: "", desc: "", label: "", image: null });
       });
     } catch {
       notify("Something went wrong when you try to add exam, try again!");
     }
   };
 
-  const handleEditExam = (formData: FormData) => {
+  const handleEditExam = (data: any) => {
     try {
-      formData.append("courseId", editingExam.courseId);
-      formData.append("id", editingExam.exam.id);
+      const formData = handleFormData(data);
+      formData.append("courseId", String(editingExam?.courseId));
+      formData.append("id", String(editingExam?.id));
       examApi.edit(formData).then(() => {
         notify("Exam edited successfully!");
         setEditingExam(null);
@@ -201,7 +216,7 @@ const AdminPage = () => {
           schema={courseSchema(false)}
           fields={courseFields}
           onSubmit={handleAddCourse}
-          defaultValues={{ title: "", desc: "", label: "", image: null }}
+          defaultValues={defaultValues}
         />
       </div>
 
@@ -229,11 +244,7 @@ const AdminPage = () => {
               </div>
               <div className="space-x-2">
                 <button
-                  onClick={() => {
-                    console.log(course);
-                    setEditingCourse(course);
-                    setIsEdit(true);
-                  }}
+                  onClick={() => handleOpenFormEditCourse(course)}
                   className="text-blue-500 dark:text-blue-400 hover:text-blue-700"
                 >
                   <FaEdit />
@@ -262,7 +273,7 @@ const AdminPage = () => {
                       <div className="space-x-2">
                         <button
                           onClick={() => {
-                            setEditingExam({ courseId: course.id, exam: exam });
+                            setEditingExam({ courseId: course.id, id: exam.id, title:"", content: "", isComplete: false, fileExams: undefined, fileSubmission: undefined });
                             setIsEdit(true);
                           }}
                           className="text-blue-500 hover:text-blue-700"
@@ -271,7 +282,7 @@ const AdminPage = () => {
                         </button>
                         <button
                           onClick={() => handleDeleteExam(exam.id)}
-                          className="text-red-500 hover:text-red-700"
+                          className="text-red-500 dark:text-red-400 hover:text-red-700"
                         >
                           <FaTrash />
                         </button>
@@ -319,7 +330,14 @@ const AdminPage = () => {
                 </div>
                 <div className="flex justify-end">
                   <button
-                    onClick={() => setOpenAddExam(!openAddExam)}
+                    onClick={() => {
+                      setOpenAddExam(!openAddExam);
+                      setDefaultValues({
+                        title: "",
+                        content: "",
+                        file: null,
+                      });
+                    }}
                     className="font-semibold mb-2 flex items-center gap-2 mr-0 text-red-500"
                   >
                     {!openAddExam ? (
@@ -345,11 +363,7 @@ const AdminPage = () => {
                     schema={examSchema}
                     fields={examFields}
                     onSubmit={handleAddExam}
-                    defaultValues={{
-                      title: "",
-                      content: "",
-                      file: null,
-                    }}
+                    defaultValues={defaultValues}
                   />
                 )}
               </div>
@@ -376,12 +390,7 @@ const AdminPage = () => {
               schema={courseSchema(isEdit)}
               fields={courseFields}
               onSubmit={handleEditCourse}
-              defaultValues={{
-                title: "",
-                desc: "",
-                label: "",
-                image: null,
-              }}
+              defaultValues={defaultValues}
             />
           </div>
         </div>

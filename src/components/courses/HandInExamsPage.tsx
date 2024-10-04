@@ -1,12 +1,13 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
-import CustomForm from "../customForm/customForm";
 import { z } from "zod";
 import submissionApi from "@/api/submission.api";
 import { notify } from "@/commons/notify";
+import CustomForm from "../customForm/CustomForm";
+import { handleFormData } from "@/commons/formDataHandler";
 
 const schema = z.object({
-  exam: z
+  file: z
     .any()
     .refine((file) => file?.[0], "File is required")
     .refine((file) => {
@@ -17,12 +18,14 @@ const schema = z.object({
 });
 
 const HandInExamsPage = () => {
-  const fields = [{ name: "exam", type: "file", accept: "" }];
+  const fields = [{ name: "file", type: "file", accept: "", label:"Your answer" }];
   const location = useLocation();
   const state = location.state;
 
-  const handleAddExam = (formData: FormData) => {
+  const handleAddExam = (data: any) => {
     try{
+      const formData = handleFormData(data);
+      console.log(data);
       let user: any;
       const userJson = localStorage.getItem("user");
       if (userJson) user = JSON.parse(userJson);
@@ -66,7 +69,7 @@ const HandInExamsPage = () => {
               fields={fields}
               onSubmit={handleAddExam}
               defaultValues={{
-                exam: null,
+                file: null,
               }}
             />
           </div>

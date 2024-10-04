@@ -13,8 +13,7 @@ const examApi = {
       });
   },
   edit(payload: FormData) {
-      const url = `${baseUrl}/${payload.get("id")}`;
-      return axiosClient.put(url, payload, {
+      return axiosClient.put(baseUrl, payload, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

@@ -8,13 +8,29 @@ export interface Exam {
   courseId: number;
   content: string;
   isComplete: boolean;
+  fileExams?
+   : [
+    {
+      fileName: string,
+      fileUrl: string
+    }
+  ];
+  fileSubmission?: [
+    {
+      fileName: string,
+      fileUrl: string
+    }
+  ]
 }
 
 export interface Course {
   id: number;
   title: string;
   desc: string;
-  imageUrl: string;
+  file : {
+    fileName : string;
+    fileUrl : string;
+  }
   label: string;
   exams: Exam[];
 }
@@ -52,7 +68,7 @@ const CoursePage = () => {
             >
               <div className="bg-white dark:bg-slate-700 rounded-lg shadow-md overflow-hidden cursor-pointer transition duration-300 transform hover:scale-105">
                 <img
-                  src={course.imageUrl}
+                  src={course.file.fileUrl}
                   alt={course.title}
                   loading="lazy"
                   className="w-full h-48 object-cover"
