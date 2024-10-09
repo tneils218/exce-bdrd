@@ -19,6 +19,10 @@ const authApi = {
     const url = `${baseUrl}/logout`;
     return axiosClient.post(url);
   },
+  changePassword(payload: object) {
+    const url = `${baseUrl}/change-password`;
+    return axiosClient.post(url, payload);
+  }
 };
 
 export default authApi;

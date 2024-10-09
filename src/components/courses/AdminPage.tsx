@@ -13,7 +13,6 @@ import { z } from "zod";
 import CustomForm from "../customForm/CustomForm";
 import { Course, Exam } from "./CoursePage"; // Assuming Course and Exam are defined in CoursePage
 import { notify } from "@/commons/notify";
-import { handleFormData } from "@/commons/formDataHandler";
 
 const courseSchema = (isEdit: boolean) =>
   z.object({
@@ -41,10 +40,10 @@ const courseSchema = (isEdit: boolean) =>
 const examSchema = z.object({
   title: z.string().nonempty("Title is required"), // Đối với trường 'title', yêu cầu là một chuỗi không rỗng
   content: z.string().nonempty("Content is required"), // Tương tự cho 'content'
-  file: z.any().refine((file) => {
-    if (!file?.[0]) return true; // Không có file, bỏ qua kiểm tra định dạng
+  files: z.any().refine((files) => {
+    if (!files?.[0]) return true; // Không có file, bỏ qua kiểm tra định dạng
     const allowedExtensions = ["zip", "rar"];
-    const fileExtension = file[0].name.split(".").pop().toLowerCase();
+    const fileExtension = files[0].name.split(".").pop().toLowerCase();
     return allowedExtensions.includes(fileExtension); // Kiểm tra định dạng file
   }, "File format must be ZIP or RAR"), // Nếu không hợp lệ, thông báo lỗi
 });
@@ -57,19 +56,46 @@ const AdminPage = () => {
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [openAddExam, setOpenAddExam] = useState(false);
   const [examPages, setExamPages] = useState<Record<number, number>>({});
+  const [expandedExam, setExpandedExam] = useState<number | null>(null);
   const [defaultValues, setDefaultValues] = useState({});
   const examsPerPage = 3;
   const [courseFields] = useState([
-    { name: "title", type: "text", placeholder: "Course Title", label: "Title" },
-    { name: "desc",  type: "text", placeholder: "Course Description", label: "Description" },
-    { name: "label", type: "text", placeholder: "Course Label", label: "Label"},
-    { name: "image", type: "file", accept: "image/*", label: "Image" },
+    {
+      name: "title",
+      type: "text",
+      placeholder: "Course Title",
+      label: "Title",
+    },
+    {
+      name: "desc",
+      type: "text",
+      placeholder: "Course Description",
+      label: "Description",
+    },
+    {
+      name: "label",
+      type: "text",
+      placeholder: "Course Label",
+      label: "Label",
+    },
+    {
+      name: "image",
+      type: "file",
+      accept: "image/*",
+      label: "Image",
+      multiple: false,
+    },
   ]);
 
   const [examFields] = useState([
-    { name: "title",   type: "text", placeholder: "Exam Title",   label: "Title"  },
-    { name: "content", type: "text", placeholder: "Exam Content", label: "Content" },
-    { name: "file", type: "file", label: "File", multiple: true },
+    { name: "title", type: "text", placeholder: "Exam Title", label: "Title" },
+    {
+      name: "content",
+      type: "text",
+      placeholder: "Exam Content",
+      label: "Content",
+    },
+    { name: "files", type: "file", label: "File", multiple: true },
   ]);
 
   const [reloadData, setReloadData] = useState(false);
@@ -78,6 +104,7 @@ const AdminPage = () => {
     try {
       const res = await courseApi.getAll();
       setCourses(res.data);
+      console.log(res.data);
     } catch (error) {
       notify("Error fetching courses, try again!");
     }
@@ -94,15 +121,13 @@ const AdminPage = () => {
     }
   }, [reloadData]);
 
-  const handleAddCourse = (data: any) => {
+  const handleAddCourse = (formData: any) => {
     try {
-      const formData = handleFormData(data);
-
       let user: any;
       let userJson = localStorage.getItem("user");
       if (userJson) user = JSON.parse(userJson);
       formData.append("userId", user.id);
-  
+
       courseApi.add(formData).then(() => {
         notify("Course added successfully!");
         setReloadData(true);
@@ -116,14 +141,12 @@ const AdminPage = () => {
     {
       setEditingCourse(course);
       setIsEdit(true);
-      setDefaultValues({title: "", desc: "", label: "", image: null });
+      setDefaultValues({ title: "", desc: "", label: "", image: null });
     }
   };
 
-  const handleEditCourse =  (data: any) => {
+  const handleEditCourse = (formData: any) => {
     try {
-      const formData = handleFormData(data);
-
       formData.append("id", String(editingCourse?.id));
       courseApi.edit(formData).then(() => {
         notify("Course edited successfully!");
@@ -161,10 +184,8 @@ const AdminPage = () => {
     return course.exams.slice(indexOfFirstExam, indexOfLastExam);
   };
 
-  const handleAddExam = (data: any) => {
+  const handleAddExam = (formData: any) => {
     try {
-      const formData = handleFormData(data);
-      console.log("hello");
       formData.append("courseId", String(expandedCourse));
       examApi.add(formData).then(() => {
         notify("Exam added successfully!");
@@ -177,9 +198,8 @@ const AdminPage = () => {
     }
   };
 
-  const handleEditExam = (data: any) => {
+  const handleEditExam = (formData: any) => {
     try {
-      const formData = handleFormData(data);
       formData.append("courseId", String(editingExam?.courseId));
       formData.append("id", String(editingExam?.id));
       examApi.edit(formData).then(() => {
@@ -190,6 +210,10 @@ const AdminPage = () => {
     } catch {
       notify("Something went wrong when you try to edit exam, try again!");
     }
+  };
+
+  const toggleExamExpansion = (examId: number) => {
+    setExpandedExam(expandedExam === examId ? null : examId);
   };
 
   const handleDeleteExam = (id: number) => {
@@ -267,29 +291,77 @@ const AdminPage = () => {
                   {getVisibleExams(course).map((exam) => (
                     <li
                       key={exam.id}
-                      className="flex justify-between items-center bg-gray-100 dark:bg-slate-600 dark:text-gray-200 p-2 rounded"
+                      className="flex flex-col justify-between items-start bg-gray-100 dark:bg-slate-600 dark:text-gray-200 p-2 rounded"
                     >
-                      <span>{exam.title}</span>
-                      <div className="space-x-2">
-                        <button
-                          onClick={() => {
-                            setEditingExam({ courseId: course.id, id: exam.id, title:"", content: "", isComplete: false, fileExams: undefined, fileSubmission: undefined });
-                            setIsEdit(true);
-                          }}
-                          className="text-blue-500 hover:text-blue-700"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteExam(exam.id)}
-                          className="text-red-500 dark:text-red-400 hover:text-red-700"
-                        >
-                          <FaTrash />
-                        </button>
+                      <div className="flex justify-between w-full">
+                        <span>{exam.title}</span>
+                        <div className="space-x-2 flex items-center">
+                          <button
+                            onClick={() => toggleExamExpansion(exam.id)}
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+                          >
+                            {expandedExam === exam.id ? (
+                              <FaChevronUp />
+                            ) : (
+                              <FaChevronDown />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingExam({
+                                courseId: course.id,
+                                id: exam.id,
+                                title: exam.title, // Sửa thành exam.title
+                                content: exam.content, // Sửa thành exam.content
+                                isComplete: exam.isComplete, // Dữ liệu từ exam
+                                fileExams: exam.fileExams, // Sử dụng đúng fileExams từ exam
+                                fileSubmission: exam.fileSubmission, // Sử dụng đúng fileSubmission từ exam
+                              });
+                              setIsEdit(true);
+                            }}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExam(exam.id)}
+                            className="text-red-500 dark:text-red-400 hover:text-red-700"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Hiển thị chi tiết khi mở rộng exam */}
+                      {expandedExam === exam.id && (
+                        <div className="mt-2 text-gray-700 dark:text-gray-300">
+                          {/* Hiển thị danh sách file nếu có */}
+                          {exam.fileExams && exam.fileExams.length > 0 && (
+                            <ul>
+                              {exam.fileExams.map((file, index) => (
+                                <li key={index}>
+                                  <a
+                                    href={file.fileUrl} // Sử dụng đúng fileUrl
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline"
+                                  >
+                                    {file.fileName}{" "}
+                                    {/* Sử dụng đúng fileName */}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {/* Hiển thị nội dung exam */}
+                          <p>{exam.content}</p>{" "}
+                          {/* Hiển thị đúng nội dung của exam */}
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
+
                 <div className="flex justify-center mt-4">
                   <button
                     onClick={() =>
@@ -415,9 +487,9 @@ const AdminPage = () => {
               fields={examFields}
               onSubmit={handleEditExam}
               defaultValues={{
-                title: "",
-                content: "",
-                file: null,
+                title: editingExam.title,
+                content: editingExam.content,
+                file: editingExam.fileExams,
               }}
             />
           </div>

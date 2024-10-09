@@ -39,12 +39,12 @@ export const routes: AppRoute[] = [
     showNavBar: true,
     isProtected: false,
   },
-  {
-    path: "/password",
-    element: () => import("@/components/account/Security"),
-    showNavBar: true,
-    isProtected: false,
-  },
+  // {
+  //   path: "/password",
+  //   element: () => import("@/components/account/Security"),
+  //   showNavBar: true,
+  //   isProtected: false,
+  // },
   {
     path: "/test",
     element: () => import("@/pages/Test.tsx"),

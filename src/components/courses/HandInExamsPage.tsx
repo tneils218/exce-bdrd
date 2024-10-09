@@ -4,7 +4,6 @@ import { z } from "zod";
 import submissionApi from "@/api/submission.api";
 import { notify } from "@/commons/notify";
 import CustomForm from "../customForm/CustomForm";
-import { handleFormData } from "@/commons/formDataHandler";
 
 const schema = z.object({
   file: z
@@ -18,14 +17,12 @@ const schema = z.object({
 });
 
 const HandInExamsPage = () => {
-  const fields = [{ name: "file", type: "file", accept: "", label:"Your answer" }];
+  const fields = [{ name: "file", type: "file", accept: "", label:" Your answer", multiple: true }];
   const location = useLocation();
   const state = location.state;
 
-  const handleAddExam = (data: any) => {
+  const handleAddExam = (formData: any) => {
     try{
-      const formData = handleFormData(data);
-      console.log(data);
       let user: any;
       const userJson = localStorage.getItem("user");
       if (userJson) user = JSON.parse(userJson);
