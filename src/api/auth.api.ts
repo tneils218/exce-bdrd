@@ -15,12 +15,20 @@ const authApi = {
     const url = `${baseUrl}/register`;
     return axiosClient.post(url, body);
   },
+  fotgotPassword(body: object) {
+    const url = `${baseUrl}/forgot-password`;
+    return axiosClient.post(url, body);
+  },
   logout() {
     const url = `${baseUrl}/logout`;
     return axiosClient.post(url);
   },
   changePassword(payload: object) {
     const url = `${baseUrl}/change-password`;
+    return axiosClient.post(url, payload);
+  },
+  refreshToken(payload : object){
+    const url = `${baseUrl}/refresh-token`;
     return axiosClient.post(url, payload);
   }
 };

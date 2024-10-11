@@ -29,10 +29,10 @@ const HandInExamsPage = () => {
       formData.append("userId", user.id);
       formData.append("examId", state.exam.id);
       submissionApi.submit(formData);
-      notify("Add exam successed!");
+      notify("Submit exam successed!");
     }
     catch {
-      notify("Something happended while adding exam, please try again!");
+      notify("Something happended while Submiting exam, please try again!");
     }
   
   };

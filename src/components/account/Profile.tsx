@@ -14,7 +14,7 @@ import {
 } from "../ui/dialog";
 import CustomForm from "../customForm/CustomForm";
 import { z } from "zod";
-import authApi from "@/api/login.api";
+import authApi from "@/api/auth.api";
 import { StatusCode } from "@/commons/utils";
 
 export interface User {

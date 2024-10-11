@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React from "react";
-import authApi from "@/api/login.api.ts";
+import authApi from "@/api/auth.api";
 import { StatusCode } from "@/commons/utils.ts";
 import { useNavigate } from "react-router-dom";
 
@@ -102,7 +102,7 @@ const Register: React.FC = () => {
                   }
                 />
               </div>
-              <Button type="submit" className="w-full dark:text-black">
+              <Button type="submit"  className="bg-blue-500 dark:b  g-blue-600 text-white dark:text-gray-100 mt-3 p-2 rounded hover:bg-blue-600 dark:hover:bg-blue-700">
                 Create an account
               </Button>
             </div>

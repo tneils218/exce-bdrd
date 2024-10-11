@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,10 +9,31 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React from "react";
-import authApi from "@/api/login.api.ts";
+import authApi from "@/api/auth.api";
 import { useNavigate } from "react-router-dom";
 import { StatusCode } from "@/commons/utils.ts";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import CustomForm from "@/components/customForm/CustomForm";
+import { z } from "zod";
+import { notify, resposeFailureNotify } from "@/commons/notify";
+import { refreshToken } from "@/commons/refreshToken";
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+const forgotPasswordField = [
+  {
+    name: "email",
+    type: "text",
+    placeholder: "Your email",
+    label: "Enter your email to get your confirmation link",
+  },
+];
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -20,17 +42,19 @@ const Login: React.FC = () => {
     password: "",
   });
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false); // Thêm state này để quản lý Dialog
+
   const clearData = () => {
     setPostData({ username: "", password: "" });
   };
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmitLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isDialogOpen) return; // Ngăn không submit form login khi dialog mở
 
     try {
-      const response = await authApi.login(
-        postData.username,
-        postData.password,
-      );
+      const response = await authApi.login(postData.username, postData.password);
+      console.log("response login");
       if (response.status === StatusCode.OK) {
         localStorage.setItem("token", `${response.data.data.token}`);
         localStorage.setItem("user", `${JSON.stringify(response.data.data)}`);
@@ -42,6 +66,32 @@ const Login: React.FC = () => {
       setErrorMessage(error?.response.data.message);
     }
   };
+
+  const handleForgotPassword = async (data: any) => {
+    try {
+      const res = await authApi.fotgotPassword(data);
+      if (res.status === 200) {
+        notify("Please check your email!"); 
+        setIsDialogOpen(false); 
+      }
+    } catch (error: any) {
+      resposeFailureNotify(error);
+    }
+  };
+
+  useEffect(() => {
+    const handleEnterKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && isDialogOpen) {
+        e.preventDefault(); 
+      }
+    };
+
+    document.addEventListener("keydown", handleEnterKeyPress);
+    return () => {
+      document.removeEventListener("keydown", handleEnterKeyPress);
+    };
+  }, [isDialogOpen]);
+
   return (
     <div className="flex min-h-screen items-center justify-center">
       <Card className="mx-auto max-w-sm">
@@ -52,7 +102,7 @@ const Login: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form autoComplete="off" onSubmit={handleSubmit}>
+          <form autoComplete="off" onSubmit={handleSubmitLogin}>
             <div className="grid gap-4">
               {errorMessage && (
                 <div className="text-red-500 text-sm text-center">
@@ -74,12 +124,24 @@ const Login: React.FC = () => {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline"
-                  >
-                    Forgot your password?
-                  </a>
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                      <p className="ml-auto inline-block text-sm underline cursor-pointer">
+                        Forgot your password?
+                      </p>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogTitle> Forgot password</DialogTitle>
+                      <CustomForm
+                        schema={forgotPasswordSchema}
+                        fields={forgotPasswordField}
+                        onSubmit={handleForgotPassword}
+                        defaultValues={{
+                         email: ""
+                        }}
+                      />
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 <Input
                   id="password"

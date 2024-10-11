@@ -311,11 +311,11 @@ const AdminPage = () => {
                               setEditingExam({
                                 courseId: course.id,
                                 id: exam.id,
-                                title: exam.title, // Sửa thành exam.title
-                                content: exam.content, // Sửa thành exam.content
-                                isComplete: exam.isComplete, // Dữ liệu từ exam
-                                filesExam: exam.filesExam, // Sử dụng đúng fileExams từ exam
-                                fileSubmission: exam.fileSubmission, // Sử dụng đúng fileSubmission từ exam
+                                title: exam.title, 
+                                content: exam.content, 
+                                isComplete: exam.isComplete, 
+                                filesExam: exam.filesExam, 
+                                fileSubmission: exam.fileSubmission, 
                               });
                               setIsEdit(true);
                             }}
@@ -355,9 +355,6 @@ const AdminPage = () => {
                               ))}
                             </ul>
                           )}
-                          {/* Hiển thị nội dung exam */}
-                          
-                          {/* Hiển thị đúng nội dung của exam */}
                         </div>
                       )}
                     </li>

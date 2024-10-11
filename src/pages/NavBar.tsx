@@ -17,8 +17,13 @@ import { Home, Users2 } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
 import { ModeToggle } from "@/components/themes/mode-toggle";
+import authApi from "@/api/auth.api";
 
 const NavBar: React.FC = () => {
+  const handleLogout = () => {
+    authApi.logout();
+    localStorage.clear();
+  }
   return (
     <div>
       <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -37,14 +42,14 @@ const NavBar: React.FC = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-
                 <DropdownMenuItem>
-                  <Link to={"/profile"}>
-                    Profile
-                  </Link>
+                  <Link to={"/profile"}>Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem>
+                  {" "}
+                  <Link to={"/login"} onClick={handleLogout}>Logout</Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Tooltip>
