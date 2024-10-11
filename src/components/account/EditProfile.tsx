@@ -10,7 +10,7 @@ import userApi from "@/api/user.api";
 import { notify } from "@/commons/notify";
 import { StatusCode } from "@/commons/utils";
 import axios from "axios";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Label } from "../ui/label";
 
 // Define schema using zod
 const EditProfile = (props: any) => {
@@ -103,6 +103,13 @@ const EditProfile = (props: any) => {
         if (updateResponse.status == StatusCode.OK) {
           notify("Edit profile successed!");
           setIsEditing(false);
+          var res = await userApi.getById(user.id);
+          user.fullName = data.fullName;
+          user.phoneNumber = data.phoneNumber;
+          user.dob = res.data.dob;
+          console.log(res.data);
+          user.avatarUrl = res.data.avatarUrl;    
+          localStorage.setItem("user", JSON.stringify(user));                            
         } else notify(JSON.parse(updateResponse.data).message);
       }
     } catch {
@@ -219,7 +226,10 @@ const EditProfile = (props: any) => {
                   />
                 </div>
               )}
-              <Label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <Label
+                htmlFor="avatar"
+                className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
                 {file ? ( // Kiểm tra xem đã có file được chọn chưa
                   <>{file.name}</>
                 ) : user.avatarUrl ? (

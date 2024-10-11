@@ -199,7 +199,10 @@ const Profile = () => {
                   <dd className="mt-10 text-sm text-gray-900 flex justify-end">
                     <Dialog >
                       <DialogTrigger asChild>
-                        <Button>Change Password</Button>
+                        <Button
+                         className="inline-flex items-center mt-10 px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          Change Password
+                          </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>

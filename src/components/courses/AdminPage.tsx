@@ -314,7 +314,7 @@ const AdminPage = () => {
                                 title: exam.title, // Sửa thành exam.title
                                 content: exam.content, // Sửa thành exam.content
                                 isComplete: exam.isComplete, // Dữ liệu từ exam
-                                fileExams: exam.fileExams, // Sử dụng đúng fileExams từ exam
+                                filesExam: exam.filesExam, // Sử dụng đúng fileExams từ exam
                                 fileSubmission: exam.fileSubmission, // Sử dụng đúng fileSubmission từ exam
                               });
                               setIsEdit(true);
@@ -336,9 +336,11 @@ const AdminPage = () => {
                       {expandedExam === exam.id && (
                         <div className="mt-2 text-gray-700 dark:text-gray-300">
                           {/* Hiển thị danh sách file nếu có */}
-                          {exam.fileExams && exam.fileExams.length > 0 && (
-                            <ul>
-                              {exam.fileExams.map((file, index) => (
+                          <p>{exam.content}</p>{" "}
+                          <p className="font-bold">Included files: </p>
+                          {exam.filesExam && exam.filesExam.length > 0 && (
+                            <ul className="list-disc pl-10">
+                              {exam.filesExam.map((file, index) => (
                                 <li key={index}>
                                   <a
                                     href={file.fileUrl} // Sử dụng đúng fileUrl
@@ -354,7 +356,7 @@ const AdminPage = () => {
                             </ul>
                           )}
                           {/* Hiển thị nội dung exam */}
-                          <p>{exam.content}</p>{" "}
+                          
                           {/* Hiển thị đúng nội dung của exam */}
                         </div>
                       )}
@@ -489,7 +491,7 @@ const AdminPage = () => {
               defaultValues={{
                 title: editingExam.title,
                 content: editingExam.content,
-                file: editingExam.fileExams,
+                file: editingExam.filesExam,
               }}
             />
           </div>

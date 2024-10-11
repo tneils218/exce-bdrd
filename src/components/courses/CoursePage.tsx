@@ -8,17 +8,17 @@ export interface Exam {
   courseId: number;
   content: string;
   isComplete: boolean;
-  fileExams?
+  filesExam?
    : [
     {
-      fileName: string,
-      fileUrl: string
+      fileName: string;
+      fileUrl: string;
     }
   ];
   fileSubmission?: [
     {
-      fileName: string,
-      fileUrl: string
+      fileName: string;
+      fileUrl: string;
     }
   ]
 }

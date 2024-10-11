@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodSchema } from "zod";
@@ -40,9 +40,22 @@ const CustomForm: React.FC<GenericFormProps> = ({
 
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: File[] }>({});
 
+  useEffect(() => {
+    console.log("defaultValues.file");
+    console.log(defaultValues.file);
+    if(defaultValues.file){
+      defaultValues.file.map((fileExam: any) => {
+        console.log("fileExam");
+        console.log(fileExam);
+        // setSelectedFiles(defaultValues.file);
+      })
+    }
+  })
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: string) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
+      console.log("filesArray")
+      console.log(filesArray)
       setSelectedFiles((prevFiles) => ({
         ...prevFiles,
         [fieldName]: filesArray,
