@@ -34,6 +34,18 @@ export const routes: AppRoute[] = [
     isProtected: false,
   },
   {
+    path: "/profile",
+    element: () => import("@/components/account/Profile"),
+    showNavBar: true,
+    isProtected: false,
+  },
+  // {
+  //   path: "/password",
+  //   element: () => import("@/components/account/Security"),
+  //   showNavBar: true,
+  //   isProtected: false,
+  // },
+  {
     path: "/test",
     element: () => import("@/pages/Test.tsx"),
     showNavBar: true,

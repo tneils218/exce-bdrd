@@ -15,10 +15,15 @@ const userApi = {
     return axiosClient.post(baseUrl, data);
   },
 
-  update(id: string, data: object) {
+  update(id: string, data: FormData) {
     const url = `${baseUrl}/${id}`;
-    return axiosClient.put(url, data);
-  },
+    console.log(data.get("file"));
+    return axiosClient.put(url, data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+},
 
   delete(id: string) {
     const url = `${baseUrl}/${id}`;

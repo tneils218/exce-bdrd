@@ -71,7 +71,7 @@ const EditorComponent: React.FC = () => {
       <div className="h-[93vh]  rounded-2xl py-6 pl-12 pr-8 flex flex-col">
         <div className="flex items-center justify-between pb-3">
           <h2 className="scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0">
-            {exam.title}
+            {exam.exam.title}
           </h2>
           <div className="flex items-center space-x-2">
             <ModeToggle />
@@ -86,7 +86,7 @@ const EditorComponent: React.FC = () => {
         <div className="flex flex-grow">
           <div className="w-1/2 pr-4 flex flex-col">
             <div className="bg-slate-200 dark:bg-slate-950 rounded-2xl p-4 flex-grow overflow-auto">
-              <p>{exam.content}</p>
+              <p>{exam.exam.content}</p>
             </div>
           </div>
           <div className="w-1/2 flex flex-col">

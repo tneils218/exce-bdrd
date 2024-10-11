@@ -9,17 +9,16 @@ import {
 } from "react-icons/fa";
 import courseApi from "@/api/course.api";
 import examApi from "@/api/exam.api";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer, toast } from "react-toastify";
 import { z } from "zod";
-import CustomForm from "../customForm/customForm";
+import CustomForm from "../customForm/CustomForm";
 import { Course, Exam } from "./CoursePage"; // Assuming Course and Exam are defined in CoursePage
+import { notify } from "@/commons/notify";
 
 const courseSchema = (isEdit: boolean) =>
   z.object({
-    title: z.string().nonempty("This is a required field"),
-    desc: z.string().nonempty("This is a required field"),
-    label: z.string().nonempty("This is a required field"),
+    title: z.string().nonempty("Title a required field"),
+    desc: z.string().nonempty("Description is a required field"),
+    label: z.string().nonempty("Label is a required field"),
     image: z
       .any()
       .refine(
@@ -41,10 +40,10 @@ const courseSchema = (isEdit: boolean) =>
 const examSchema = z.object({
   title: z.string().nonempty("Title is required"), // Đối với trường 'title', yêu cầu là một chuỗi không rỗng
   content: z.string().nonempty("Content is required"), // Tương tự cho 'content'
-  file: z.any().refine((file) => {
-    if (!file?.[0]) return true; // Không có file, bỏ qua kiểm tra định dạng
+  files: z.any().refine((files) => {
+    if (!files?.[0]) return true; // Không có file, bỏ qua kiểm tra định dạng
     const allowedExtensions = ["zip", "rar"];
-    const fileExtension = file[0].name.split(".").pop().toLowerCase();
+    const fileExtension = files[0].name.split(".").pop().toLowerCase();
     return allowedExtensions.includes(fileExtension); // Kiểm tra định dạng file
   }, "File format must be ZIP or RAR"), // Nếu không hợp lệ, thông báo lỗi
 });
@@ -56,31 +55,64 @@ const AdminPage = () => {
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [editingExam, setEditingExam] = useState<Exam | null>(null);
   const [openAddExam, setOpenAddExam] = useState(false);
-  const [examPages, setExamPages] = useState({});
+  const [examPages, setExamPages] = useState<Record<number, number>>({});
+  const [expandedExam, setExpandedExam] = useState<number | null>(null);
+  const [defaultValues, setDefaultValues] = useState({});
   const examsPerPage = 3;
   const [courseFields] = useState([
-    { name: "title", type: "text", placeholder: "Course Title" },
-    { name: "desc", type: "text", placeholder: "Course Description" },
-    { name: "label", type: "text", placeholder: "Course Label" },
-    { name: "image", type: "file", accept: "image/*" },
+    {
+      name: "title",
+      type: "text",
+      placeholder: "Course Title",
+      label: "Title",
+    },
+    {
+      name: "desc",
+      type: "text",
+      placeholder: "Course Description",
+      label: "Description",
+    },
+    {
+      name: "label",
+      type: "text",
+      placeholder: "Course Label",
+      label: "Label",
+    },
+    {
+      name: "image",
+      type: "file",
+      accept: "image/*",
+      label: "Image",
+      multiple: false,
+    },
   ]);
 
   const [examFields] = useState([
-    { name: "title", type: "text", placeholder: "Exam Title" },
-    { name: "content", type: "text", placeholder: "Exam Content" },
-    { name: "file", type: "file" },
+    { name: "title", type: "text", placeholder: "Exam Title", label: "Title" },
+    {
+      name: "content",
+      type: "text",
+      placeholder: "Exam Content",
+      label: "Content",
+    },
+    { name: "files", type: "file", label: "File", multiple: true },
   ]);
+
   const [reloadData, setReloadData] = useState(false);
-  const notify = (message: string) => toast(message);
 
   const fetchCourses = async () => {
     try {
       const res = await courseApi.getAll();
       setCourses(res.data);
+      console.log(res.data);
     } catch (error) {
       notify("Error fetching courses, try again!");
     }
   };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
 
   useEffect(() => {
     if (reloadData) {
@@ -89,39 +121,51 @@ const AdminPage = () => {
     }
   }, [reloadData]);
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
-  const handleAddCourse = (formData: FormData) => {
+  const handleAddCourse = (formData: any) => {
     try {
       let user: any;
       let userJson = localStorage.getItem("user");
       if (userJson) user = JSON.parse(userJson);
-  
       formData.append("userId", user.id);
+
       courseApi.add(formData).then(() => {
         notify("Course added successfully!");
         setReloadData(true);
       });
-    }
-    catch
-     {
+    } catch {
       notify("Something wen wrong when you try to add course, try again!");
     }
   };
 
-  const handleEditCourse = async (formData: FormData) => {
-    formData.append("id", editingCourse.id);
+  const handleOpenFormEditCourse = (course: any) => {
+    {
+      setEditingCourse(course);
+      setIsEdit(true);
+      setDefaultValues({ title: "", desc: "", label: "", image: null });
+    }
+  };
+
+  const handleEditCourse = (formData: any) => {
     try {
-      await courseApi.edit(formData).then(() => {
+      formData.append("id", String(editingCourse?.id));
+      courseApi.edit(formData).then(() => {
         notify("Course edited successfully!");
         setReloadData(true);
         setEditingCourse(null);
       });
-    } catch
-     {
+    } catch {
       notify("Something wen wrong when you try to edit course, try again!");
+    }
+  };
+
+  const handleDeleteCourse = async (id: number) => {
+    try {
+      await courseApi.delete(id).then(() => {
+        notify("Course deleted successfully!");
+        setReloadData(true);
+      });
+    } catch {
+      notify("Something wen wrong when you try to delete course, try again!");
     }
   };
 
@@ -140,23 +184,24 @@ const AdminPage = () => {
     return course.exams.slice(indexOfFirstExam, indexOfLastExam);
   };
 
-  const handleAddExam = (formData: FormData) => {
+  const handleAddExam = (formData: any) => {
     try {
-      formData.append("courseId", expandedCourse);
+      formData.append("courseId", String(expandedCourse));
       examApi.add(formData).then(() => {
         notify("Exam added successfully!");
         setReloadData(true);
         setOpenAddExam(false);
+        setDefaultValues({ title: "", desc: "", label: "", image: null });
       });
     } catch {
       notify("Something went wrong when you try to add exam, try again!");
     }
   };
 
-  const handleEditExam = (formData: FormData) => {
+  const handleEditExam = (formData: any) => {
     try {
-      formData.append("courseId", editingExam.courseId);
-      formData.append("id", editingExam.exam.id);
+      formData.append("courseId", String(editingExam?.courseId));
+      formData.append("id", String(editingExam?.id));
       examApi.edit(formData).then(() => {
         notify("Exam edited successfully!");
         setEditingExam(null);
@@ -165,6 +210,10 @@ const AdminPage = () => {
     } catch {
       notify("Something went wrong when you try to edit exam, try again!");
     }
+  };
+
+  const toggleExamExpansion = (examId: number) => {
+    setExpandedExam(expandedExam === examId ? null : examId);
   };
 
   const handleDeleteExam = (id: number) => {
@@ -180,7 +229,6 @@ const AdminPage = () => {
 
   return (
     <div className="dark:bg-slate-800 bg-slate-300 min-h-screen pl-20 pr-5">
-      <ToastContainer />
       <h1 className="text-3xl font-bold mb-6 text-center dark:text-gray-200 text-gray-800">
         Admin - Courses and Exams
       </h1>
@@ -192,7 +240,7 @@ const AdminPage = () => {
           schema={courseSchema(false)}
           fields={courseFields}
           onSubmit={handleAddCourse}
-          defaultValues={{ title: "", desc: "", label: "", image: null }}
+          defaultValues={defaultValues}
         />
       </div>
 
@@ -220,16 +268,13 @@ const AdminPage = () => {
               </div>
               <div className="space-x-2">
                 <button
-                  onClick={() => {
-                    setEditingCourse(course);
-                    setIsEdit(true);
-                  }}
+                  onClick={() => handleOpenFormEditCourse(course)}
                   className="text-blue-500 dark:text-blue-400 hover:text-blue-700"
                 >
                   <FaEdit />
                 </button>
                 <button
-                  onClick={() => courseApi.delete(course.id)}
+                  onClick={() => handleDeleteCourse(course.id)}
                   className="text-red-500 dark:text-red-400 hover:text-red-700"
                 >
                   <FaTrash />
@@ -246,29 +291,79 @@ const AdminPage = () => {
                   {getVisibleExams(course).map((exam) => (
                     <li
                       key={exam.id}
-                      className="flex justify-between items-center bg-gray-100 dark:bg-slate-600 dark:text-gray-200 p-2 rounded"
+                      className="flex flex-col justify-between items-start bg-gray-100 dark:bg-slate-600 dark:text-gray-200 p-2 rounded"
                     >
-                      <span>{exam.title}</span>
-                      <div className="space-x-2">
-                        <button
-                          onClick={() => {
-                            setEditingExam({ courseId: course.id, exam: exam });
-                            setIsEdit(true);
-                          }}
-                          className="text-blue-500 hover:text-blue-700"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteExam(exam.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <FaTrash />
-                        </button>
+                      <div className="flex justify-between w-full">
+                        <span>{exam.title}</span>
+                        <div className="space-x-2 flex items-center">
+                          <button
+                            onClick={() => toggleExamExpansion(exam.id)}
+                            className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100"
+                          >
+                            {expandedExam === exam.id ? (
+                              <FaChevronUp />
+                            ) : (
+                              <FaChevronDown />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingExam({
+                                courseId: course.id,
+                                id: exam.id,
+                                title: exam.title, // Sửa thành exam.title
+                                content: exam.content, // Sửa thành exam.content
+                                isComplete: exam.isComplete, // Dữ liệu từ exam
+                                filesExam: exam.filesExam, // Sử dụng đúng fileExams từ exam
+                                fileSubmission: exam.fileSubmission, // Sử dụng đúng fileSubmission từ exam
+                              });
+                              setIsEdit(true);
+                            }}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteExam(exam.id)}
+                            className="text-red-500 dark:text-red-400 hover:text-red-700"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
                       </div>
+
+                      {/* Hiển thị chi tiết khi mở rộng exam */}
+                      {expandedExam === exam.id && (
+                        <div className="mt-2 text-gray-700 dark:text-gray-300">
+                          {/* Hiển thị danh sách file nếu có */}
+                          <p>{exam.content}</p>{" "}
+                          <p className="font-bold">Included files: </p>
+                          {exam.filesExam && exam.filesExam.length > 0 && (
+                            <ul className="list-disc pl-10">
+                              {exam.filesExam.map((file, index) => (
+                                <li key={index}>
+                                  <a
+                                    href={file.fileUrl} // Sử dụng đúng fileUrl
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline"
+                                  >
+                                    {file.fileName}{" "}
+                                    {/* Sử dụng đúng fileName */}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          {/* Hiển thị nội dung exam */}
+                          
+                          {/* Hiển thị đúng nội dung của exam */}
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
+
                 <div className="flex justify-center mt-4">
                   <button
                     onClick={() =>
@@ -309,7 +404,14 @@ const AdminPage = () => {
                 </div>
                 <div className="flex justify-end">
                   <button
-                    onClick={() => setOpenAddExam(!openAddExam)}
+                    onClick={() => {
+                      setOpenAddExam(!openAddExam);
+                      setDefaultValues({
+                        title: "",
+                        content: "",
+                        file: null,
+                      });
+                    }}
                     className="font-semibold mb-2 flex items-center gap-2 mr-0 text-red-500"
                   >
                     {!openAddExam ? (
@@ -335,11 +437,7 @@ const AdminPage = () => {
                     schema={examSchema}
                     fields={examFields}
                     onSubmit={handleAddExam}
-                    defaultValues={{
-                      title: "",
-                      content: "",
-                      file: null,
-                    }}
+                    defaultValues={defaultValues}
                   />
                 )}
               </div>
@@ -366,12 +464,7 @@ const AdminPage = () => {
               schema={courseSchema(isEdit)}
               fields={courseFields}
               onSubmit={handleEditCourse}
-              defaultValues={{
-                title: "",
-                desc: "",
-                label: "",
-                image: null,
-              }}
+              defaultValues={defaultValues}
             />
           </div>
         </div>
@@ -396,9 +489,9 @@ const AdminPage = () => {
               fields={examFields}
               onSubmit={handleEditExam}
               defaultValues={{
-                title: "",
-                content: "",
-                file: null,
+                title: editingExam.title,
+                content: editingExam.content,
+                file: editingExam.filesExam,
               }}
             />
           </div>

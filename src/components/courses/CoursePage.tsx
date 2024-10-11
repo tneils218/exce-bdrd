@@ -2,20 +2,35 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import courseApi from "@/api/course.api";
 
-
 export interface Exam {
   id: number;
   title: string;
   courseId: number;
   content: string;
   isComplete: boolean;
+  filesExam?
+   : [
+    {
+      fileName: string;
+      fileUrl: string;
+    }
+  ];
+  fileSubmission?: [
+    {
+      fileName: string;
+      fileUrl: string;
+    }
+  ]
 }
 
 export interface Course {
   id: number;
   title: string;
-  description: string;
-  imageUrl: string;
+  desc: string;
+  file : {
+    fileName : string;
+    fileUrl : string;
+  }
   label: string;
   exams: Exam[];
 }
@@ -28,7 +43,6 @@ const CoursePage = () => {
     async function fetchCourses() {
       try {
         const res = await courseApi.getAll();
-        console.log(res.data);
         setCourses(res.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -54,7 +68,7 @@ const CoursePage = () => {
             >
               <div className="bg-white dark:bg-slate-700 rounded-lg shadow-md overflow-hidden cursor-pointer transition duration-300 transform hover:scale-105">
                 <img
-                  src={course.imageUrl}
+                  src={course.file.fileUrl}
                   alt={course.title}
                   loading="lazy"
                   className="w-full h-48 object-cover"
@@ -64,7 +78,7 @@ const CoursePage = () => {
                     {course.title}
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">
-                    {course.description}
+                    {course.desc}
                   </p>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500 dark:text-gray-400">

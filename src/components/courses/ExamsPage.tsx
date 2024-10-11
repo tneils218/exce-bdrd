@@ -1,13 +1,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaBook, FaCheckCircle, FaChevronRight } from "react-icons/fa";
-import { Course, Exam } from "./CoursePage";
 import courseApi from "@/api/course.api";
 import { useEffect, useState } from "react";
+import { Course, Exam } from "./CoursePage";
 
 const ExamsPage = () => {
   const location = useLocation();
-  const [course,setCourse] = useState<Course | null>(null);;
+
   const courseId = location.state as number;
+  const [course,setCourse] = useState<Course | null>(null);;
   useEffect(() => {
     async function fetchCourses() {
       try {
