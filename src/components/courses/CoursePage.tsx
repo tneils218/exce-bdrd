@@ -42,6 +42,7 @@ const CoursePage = () => {
   useEffect(() => {
     async function fetchCourses() {
       try {
+        console.log(new Date(Date.now()));
         const res = await courseApi.getAll();
         setCourses(res.data);
       } catch (error) {

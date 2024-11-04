@@ -12,12 +12,12 @@ export const refreshToken = async () => {
   }
   try {
     var response = await authApi.refreshToken({ accessToken, refreshToken });
-    console.log(response);
     localStorage.setItem("token", response.data.accessToken);
     user.refreshToken = response.data.refreshToken;
-  } catch {
-    notify("Your session has expired, you will be logout!");
+    localStorage.setItem("user", JSON.stringify(user)); // Cập nhật refresh token mới
+  } catch (error) {
+    console.log("Your session has expired, you will be logged out!", error);
     localStorage.clear();
-    await authApi.logout();
+    window.location.href = "/login"; // Chuyển về trang login khi refresh thất bại
   }
 };

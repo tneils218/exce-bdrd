@@ -21,7 +21,6 @@ import {
 import CustomForm from "@/components/customForm/CustomForm";
 import { z } from "zod";
 import { notify, resposeFailureNotify } from "@/commons/notify";
-import { refreshToken } from "@/commons/refreshToken";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email address"),

@@ -12,7 +12,8 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
-    console.log("First resquest");
+    console.log(new Date(Date.now()));
+    console.log("Resquest");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -31,7 +32,9 @@ axiosClient.interceptors.response.use(
   async (error) => {
     if (error.response && error.response.status === 401) {
       try {
-        console.log("First refresh");
+        console.log(new Date(Date.now()));
+        console.log("Refresh");
+        
         await refreshToken();
         
         const newToken = localStorage.getItem("token");
